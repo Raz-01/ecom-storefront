@@ -47,3 +47,8 @@ npm-install.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local AI agent tooling (installed by the Vercel/Neon integration; not app source)
+/.agents
+/.claude
+skills-lock.json

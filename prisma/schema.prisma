@@ -1,10 +1,14 @@
 // Prisma schema for the storefront.
 //
-// Datasource is Postgres (Vercel Postgres in production; point DATABASE_URL
-// at any Postgres instance for local dev — see .env.example).
+// Datasource is Postgres (Neon, provisioned via the Vercel Marketplace
+// integration; point DATABASE_URL at any Postgres instance for local dev —
+// see .env.example). `directUrl` is Neon's unpooled connection, used only
+// for migrations — DDL over a pgbouncer-style pooled connection (the
+// runtime `url`) is unreliable.
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 generator client {
