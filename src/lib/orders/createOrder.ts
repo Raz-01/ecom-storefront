@@ -11,6 +11,14 @@ export class DeliveryZoneNotFoundError extends Error {
   }
 }
 
+// Prisma's default interactive-transaction timeout is 5s, sized for a
+// same-region/local DB. Over a real network hop to a remote Postgres
+// instance (plus per-line round trips in the stock-decrement loop below),
+// a cart with several distinct line items can exceed that comfortably
+// without anything actually being wrong — so both transactions below use a
+// longer, explicit timeout.
+const ORDER_TRANSACTION_OPTIONS = { timeout: 15_000, maxWait: 10_000 };
+
 /**
  * Creates an order from a checkout submission.
  *
@@ -82,7 +90,7 @@ export async function createOrder(input: CheckoutInput): Promise<Order> {
     });
 
     return order;
-  });
+  }, ORDER_TRANSACTION_OPTIONS);
 }
 
 /**
@@ -109,7 +117,7 @@ export async function restoreOrderStock(orderId: string): Promise<void> {
       where: { id: order.id },
       data: { stockRestored: true },
     });
-  });
+  }, ORDER_TRANSACTION_OPTIONS);
 }
 
 export { OrderPricingError };
