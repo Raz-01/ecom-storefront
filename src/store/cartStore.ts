@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CartLine } from "@/types/domain";
+import type { CartLine } from "@/types/cart";
 
 type CartState = {
   lines: CartLine[];

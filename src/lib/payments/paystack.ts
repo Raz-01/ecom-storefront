@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { config } from "@/lib/config";
+import { serverEnv } from "@/lib/env.server";
 import type {
   InitializeTransactionInput,
   InitializeTransactionResult,
@@ -86,8 +86,8 @@ export function verifyPaystackWebhookSignature(rawBody: string, signatureHeader:
 }
 
 export function getPaystackSecretKeyOrThrow(): string {
-  if (config.payments.isPaystackDemoMode || !config.payments.paystackSecretKey) {
+  if (serverEnv.payments.isPaystackDemoMode || !serverEnv.payments.paystackSecretKey) {
     throw new Error("Paystack secret key is not configured");
   }
-  return config.payments.paystackSecretKey;
+  return serverEnv.payments.paystackSecretKey;
 }

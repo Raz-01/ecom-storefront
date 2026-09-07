@@ -1,123 +1,120 @@
 import type { Order } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { computeOrderTotals, OrderPricingError, type PriceableProduct } from "@/lib/orders/pricing";
-import { generateOrderNumber } from "@/lib/orders/orderNumber";
+import { resolveUnitPrice } from "@/lib/catalog/pricing";
+import { computeDeliveryFee } from "@/lib/delivery";
+import { withUniqueReferenceRetry } from "@/lib/orders/referenceCode";
 import type { CheckoutInput } from "@/lib/validation/checkout";
 
-export class DeliveryZoneNotFoundError extends Error {
-  constructor() {
-    super("Selected delivery zone is not available");
-    this.name = "DeliveryZoneNotFoundError";
+export class OrderPricingError extends Error {
+  constructor(
+    message: string,
+    /** Machine-readable reason, useful for mapping to a user-facing message. */
+    public readonly code:
+      | "PRODUCT_UNAVAILABLE"
+      | "PRODUCT_NOT_FOUND"
+      | "INSUFFICIENT_STOCK"
+      | "BELOW_MIN_ORDER_QUANTITY"
+      | "QUOTE_REQUIRED",
+    public readonly productId?: string,
+  ) {
+    super(message);
+    this.name = "OrderPricingError";
   }
 }
 
-// Prisma's default interactive-transaction timeout is 5s, sized for a
-// same-region/local DB. Over a real network hop to a remote Postgres
-// instance (plus per-line round trips in the stock-decrement loop below),
-// a cart with several distinct line items can exceed that comfortably
-// without anything actually being wrong — so both transactions below use a
-// longer, explicit timeout.
-const ORDER_TRANSACTION_OPTIONS = { timeout: 15_000, maxWait: 10_000 };
-
 /**
- * Creates an order from a checkout submission.
+ * Creates a PENDING_PAYMENT order from a checkout submission. Pricing
+ * (including any bulk-price tier) and the delivery fee are entirely
+ * recomputed here from the database — the client only ever supplies
+ * product IDs and quantities, so a tampered request can't affect what's
+ * actually charged.
  *
- * Runs inside a single DB transaction so pricing, stock validation, stock
- * decrement and order/line creation either all succeed or all roll back —
- * there is no window where stock is reserved without an order to match it,
- * or vice versa. Stock is decremented immediately at order creation
- * (rather than at payment confirmation) to prevent overselling while a
- * customer is mid-checkout; unpaid orders that are later cancelled or
- * abandoned restore their stock (see `restoreOrderStock`).
+ * Deliberately does NOT touch stock. The out-of-stock check below is a
+ * soft, point-in-time check for fast feedback ("only 3 left") — it is not
+ * a reservation. Inventory is only actually deducted once payment is
+ * confirmed (see `lib/inventory/movements.ts` + `confirmPayment.ts`), with
+ * its own guard against overselling at that point. This is the business
+ * rule from the project brief: an order existing must never hold stock
+ * hostage from an abandoned checkout.
  */
 export async function createOrder(input: CheckoutInput): Promise<Order> {
-  return prisma.$transaction(async (tx) => {
-    const deliveryZone = await tx.deliveryZone.findUnique({
-      where: { id: input.deliveryZoneId },
-    });
-    if (!deliveryZone || !deliveryZone.isActive) {
-      throw new DeliveryZoneNotFoundError();
+  const productIds = input.items.map((i) => i.productId);
+  const products = await prisma.product.findMany({
+    where: { id: { in: productIds } },
+    include: { bulkPrices: true },
+  });
+  const productsById = new Map(products.map((p) => [p.id, p]));
+
+  const lines = input.items.map((item) => {
+    const product = productsById.get(item.productId);
+    if (!product) {
+      throw new OrderPricingError(`Product ${item.productId} not found`, "PRODUCT_NOT_FOUND", item.productId);
+    }
+    if (!product.isActive) {
+      throw new OrderPricingError(`${product.name} is no longer available`, "PRODUCT_UNAVAILABLE", product.id);
+    }
+    if (item.quantity < product.minOrderQuantity) {
+      throw new OrderPricingError(
+        `Minimum order for ${product.name} is ${product.minOrderQuantity} ${product.packageSize}`,
+        "BELOW_MIN_ORDER_QUANTITY",
+        product.id,
+      );
+    }
+    if (product.stock < item.quantity) {
+      throw new OrderPricingError(`Only ${product.stock} of ${product.name} in stock`, "INSUFFICIENT_STOCK", product.id);
     }
 
-    const productIds = input.items.map((i) => i.productId);
-    const products = await tx.product.findMany({
-      where: { id: { in: productIds } },
-    });
-    const productsById = new Map<string, PriceableProduct>(products.map((p) => [p.id, p]));
-
-    const totals = computeOrderTotals(input.items, productsById, deliveryZone.feeMinor);
-
-    // Decrement stock, guarded by a WHERE clause so a concurrent order for
-    // the same product can't oversell it — if another transaction already
-    // consumed the stock, updatedCount will be 0 and we abort the order.
-    for (const line of totals.lines) {
-      const result = await tx.product.updateMany({
-        where: { id: line.productId, stock: { gte: line.quantity } },
-        data: { stock: { decrement: line.quantity } },
-      });
-      if (result.count === 0) {
-        const current = await tx.product.findUnique({ where: { id: line.productId } });
-        throw new OrderPricingError(
-          `Only ${current?.stock ?? 0} of ${line.productName} left in stock`,
-          "INSUFFICIENT_STOCK",
-          line.productId,
-        );
-      }
+    const resolution = resolveUnitPrice(product, item.quantity);
+    if (resolution.kind === "quote_required") {
+      throw new OrderPricingError(
+        `${product.name} at this quantity needs a custom quote — use "Request Bulk Quote" instead of checkout`,
+        "QUOTE_REQUIRED",
+        product.id,
+      );
     }
 
-    const order = await tx.order.create({
-      data: {
-        orderNumber: generateOrderNumber(),
-        customerName: input.customerName,
-        customerPhone: input.customerPhone,
-        customerEmail: input.customerEmail || null,
-        deliveryZoneId: deliveryZone.id,
-        deliveryAddress: input.deliveryAddress,
-        subtotalMinor: totals.subtotalMinor,
-        deliveryFeeMinor: totals.deliveryFeeMinor,
-        totalMinor: totals.totalMinor,
-        status: "PENDING_PAYMENT",
-        items: {
-          create: totals.lines.map((line) => ({
-            productId: line.productId,
-            productName: line.productName,
-            unitPriceMinor: line.unitPriceMinor,
-            quantity: line.quantity,
-            lineTotalMinor: line.lineTotalMinor,
-          })),
+    return {
+      productId: product.id,
+      productName: product.name,
+      productSku: product.sku,
+      packageSize: product.packageSize,
+      unitPriceMinor: resolution.unitPriceMinor,
+      quantity: item.quantity,
+      lineTotalMinor: resolution.unitPriceMinor * item.quantity,
+    };
+  });
+
+  const subtotalMinor = lines.reduce((sum, l) => sum + l.lineTotalMinor, 0);
+
+  const delivery =
+    input.fulfillmentMethod === "DELIVERY"
+      ? await computeDeliveryFee({ fulfillmentMethod: "DELIVERY", state: input.deliveryState })
+      : await computeDeliveryFee({ fulfillmentMethod: "PICKUP" });
+
+  const totalMinor = subtotalMinor + delivery.feeMinor;
+
+  return withUniqueReferenceRetry(
+    (orderNumber) =>
+      prisma.order.create({
+        data: {
+          orderNumber,
+          customerName: input.customerName,
+          customerPhone: input.customerPhone,
+          customerWhatsapp: input.customerWhatsapp,
+          customerEmail: input.customerEmail || null,
+          fulfillmentMethod: input.fulfillmentMethod,
+          deliveryZoneId: delivery.deliveryZoneId,
+          deliveryState: input.fulfillmentMethod === "DELIVERY" ? input.deliveryState : null,
+          deliveryCity: input.fulfillmentMethod === "DELIVERY" ? input.deliveryCity : null,
+          deliveryAddress: input.fulfillmentMethod === "DELIVERY" ? input.deliveryAddress : null,
+          deliveryLandmark: input.fulfillmentMethod === "DELIVERY" ? input.deliveryLandmark || null : null,
+          deliveryFeeMinor: delivery.feeMinor,
+          subtotalMinor,
+          totalMinor,
+          status: "PENDING_PAYMENT",
+          items: { create: lines },
         },
-      },
-    });
-
-    return order;
-  }, ORDER_TRANSACTION_OPTIONS);
+      }),
+    "orderNumber",
+  );
 }
-
-/**
- * Restores stock for an order whose payment failed or was cancelled.
- * Idempotent via the `stockRestored` flag — safe to call more than once
- * (e.g. if a webhook and a client-side poll both observe the failure).
- */
-export async function restoreOrderStock(orderId: string): Promise<void> {
-  await prisma.$transaction(async (tx) => {
-    const order = await tx.order.findUnique({
-      where: { id: orderId },
-      include: { items: true },
-    });
-    if (!order || order.stockRestored) return;
-
-    for (const item of order.items) {
-      await tx.product.update({
-        where: { id: item.productId },
-        data: { stock: { increment: item.quantity } },
-      });
-    }
-
-    await tx.order.update({
-      where: { id: order.id },
-      data: { stockRestored: true },
-    });
-  }, ORDER_TRANSACTION_OPTIONS);
-}
-
-export { OrderPricingError };

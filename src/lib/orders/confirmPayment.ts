@@ -1,57 +1,60 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { restoreOrderStock } from "@/lib/orders/createOrder";
+import { deductStockForOrder } from "@/lib/inventory/movements";
 
 /**
- * Transitions an order to PAID. Idempotent: if the order is already PAID
- * (e.g. both the redirect-driven verify call and the webhook fire for the
- * same payment), this is a no-op rather than double-processing.
+ * Records a successful payment attempt (looked up by `Payment.reference`,
+ * unique per attempt — not the order number, since an order can have more
+ * than one attempt if an earlier one failed) and, the first time an order
+ * reaches PAID, deducts inventory in the same transaction.
+ *
+ * Idempotent: the redirect-driven callback and the webhook can both fire
+ * for the same payment, and a webhook can be retried by the provider —
+ * none of that double-processes the order or double-deducts stock.
  */
-export async function markOrderPaid(params: {
-  orderNumber: string;
-  paymentReference: string;
-  paymentProvider: string;
+export async function markPaymentSuccess(params: {
+  reference: string;
+  amountMinor: number;
+  rawResponse?: Prisma.InputJsonValue;
 }): Promise<void> {
-  const order = await prisma.order.findUnique({ where: { orderNumber: params.orderNumber } });
-  if (!order) throw new Error(`Order ${params.orderNumber} not found`);
-  if (order.status === "PAID") return;
+  await prisma.$transaction(
+    async (tx) => {
+      const payment = await tx.payment.findUnique({ where: { reference: params.reference } });
+      if (!payment) throw new Error(`Payment ${params.reference} not found`);
+      if (payment.status === "SUCCESS") return; // already processed
 
-  // Only a PENDING_PAYMENT order should ever transition to PAID. A FAILED
-  // or CANCELLED order that somehow gets a late success callback is left
-  // alone and flagged via the thrown error for manual/ops follow-up rather
-  // than silently marking money as received on a dead order.
-  if (order.status !== "PENDING_PAYMENT") {
-    throw new Error(`Cannot mark order ${params.orderNumber} as paid from status ${order.status}`);
-  }
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: { status: "SUCCESS", paidAt: new Date(), rawResponse: params.rawResponse },
+      });
 
-  await prisma.order.update({
-    where: { id: order.id },
-    data: {
-      status: "PAID",
-      paidAt: new Date(),
-      paymentReference: params.paymentReference,
-      paymentProvider: params.paymentProvider,
+      const order = await tx.order.findUniqueOrThrow({ where: { id: payment.orderId } });
+      if (order.status === "PAID") return; // a different payment attempt on this order already confirmed it
+
+      if (order.status !== "PENDING_PAYMENT" && order.status !== "PAYMENT_PROCESSING") {
+        // e.g. a CANCELLED order gets a late success callback. The payment
+        // record above is still updated (the money is real and must be
+        // accounted for), but we don't resurrect a dead order — that needs
+        // manual ops follow-up, not a silent status flip.
+        return;
+      }
+
+      await tx.order.update({ where: { id: order.id }, data: { status: "PAID" } });
+
+      const items = await tx.orderItem.findMany({ where: { orderId: order.id } });
+      await deductStockForOrder(tx, {
+        orderId: order.id,
+        items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+      });
     },
-  });
+    { timeout: 15_000 }, // remote Postgres round-trips add up across several sequential queries
+  );
 }
 
-/** Transitions an order to PAYMENT_FAILED and releases its reserved stock. Idempotent. */
-export async function markOrderFailed(params: {
-  orderNumber: string;
-  paymentReference: string;
-  paymentProvider: string;
-}): Promise<void> {
-  const order = await prisma.order.findUnique({ where: { orderNumber: params.orderNumber } });
-  if (!order) throw new Error(`Order ${params.orderNumber} not found`);
-  if (order.status === "PAYMENT_FAILED" || order.status === "PAID") return;
-
-  await prisma.order.update({
-    where: { id: order.id },
-    data: {
-      status: "PAYMENT_FAILED",
-      paymentReference: params.paymentReference,
-      paymentProvider: params.paymentProvider,
-    },
+/** Records a failed/abandoned payment attempt. The order itself stays PENDING_PAYMENT so the customer can retry with a fresh attempt. */
+export async function markPaymentFailed(params: { reference: string; rawResponse?: Prisma.InputJsonValue }): Promise<void> {
+  await prisma.payment.updateMany({
+    where: { reference: params.reference, status: "PENDING" },
+    data: { status: "FAILED", rawResponse: params.rawResponse },
   });
-
-  await restoreOrderStock(order.id);
 }

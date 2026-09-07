@@ -1,4 +1,4 @@
-import { config } from "@/lib/config";
+import { serverEnv } from "@/lib/env.server";
 import { DemoPaymentProvider } from "@/lib/payments/demoProvider";
 import { PaystackProvider } from "@/lib/payments/paystack";
 import type { PaymentProvider } from "@/lib/payments/types";
@@ -9,9 +9,9 @@ let cachedProvider: PaymentProvider | undefined;
 export function getPaymentProvider(): PaymentProvider {
   if (cachedProvider) return cachedProvider;
 
-  cachedProvider = config.payments.isPaystackDemoMode
+  cachedProvider = serverEnv.payments.isPaystackDemoMode
     ? new DemoPaymentProvider()
-    : new PaystackProvider(config.payments.paystackSecretKey!);
+    : new PaystackProvider(serverEnv.payments.paystackSecretKey!);
 
   return cachedProvider;
 }

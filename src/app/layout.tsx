@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { publicConfig } from "@/lib/publicConfig";
-import { Header } from "@/components/Header";
+import { businessConfig } from "@/lib/business.config";
+import { SiteHeader } from "@/components/site/SiteHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: publicConfig.business.name,
-  description: `Shop ${publicConfig.business.name} online.`,
+  title: { default: businessConfig.name, template: `%s — ${businessConfig.name}` },
+  description: businessConfig.description,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black">
-        <Header />
+        <SiteHeader />
         <div className="flex flex-1 flex-col">{children}</div>
       </body>
     </html>

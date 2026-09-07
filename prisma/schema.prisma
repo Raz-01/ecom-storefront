@@ -1,4 +1,4 @@
-// Prisma schema for the storefront.
+// Prisma schema for Ilorin Bulk Mart.
 //
 // Datasource is Postgres (Neon, provisioned via the Vercel Marketplace
 // integration; point DATABASE_URL at any Postgres instance for local dev —
@@ -15,85 +15,210 @@ generator client {
   provider = "prisma-client-js"
 }
 
-/// A product category, used for storefront navigation/filtering.
-model Category {
-  id        String    @id @default(cuid())
-  name      String
-  slug      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+// ---------------------------------------------------------------------------
+// Admin / staff
+// ---------------------------------------------------------------------------
+
+/// Three roles for Phase 1. A new role later is one enum value plus one
+/// entry in `lib/auth/permissions.ts` — not a schema migration — so this
+/// stays a plain enum rather than a fully generalized Role/Permission table,
+/// which would be more machinery than three known roles justify right now.
+enum AdminRole {
+  OWNER
+  ADMIN
+  WAREHOUSE_STAFF
 }
 
-/// A sellable product. Price is stored in minor currency units (e.g. kobo)
-/// as an integer to avoid floating-point rounding errors in money math.
-model Product {
-  id          String      @id @default(cuid())
+/// A staff account. Customers never get accounts — see the Order model.
+model AdminUser {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  inventoryMovements InventoryMovement[]
+  quoteUpdates       QuoteRequest[]       @relation("QuoteHandledBy")
+}
+
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+
+model Category {
+  id          String    @id @default(cuid())
   name        String
-  slug        String      @unique
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum PackageType {
+  BAG
+  CARTON
+  BOTTLE
+  PACK
+  SACK
+  BOX
+}
+
+/// A sellable product, sold strictly in the package unit represented here
+/// (there is no separate "loose unit" model — bulk wholesale sells by the
+/// bag/carton/sack). Price is stored in minor currency units (kobo) as an
+/// integer to avoid floating-point rounding errors in money math.
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  sku         String   @unique
   description String
-  priceMinor  Int // price in minor units (e.g. kobo for NGN)
-  imageUrl    String?
-  stock       Int         @default(0)
-  isActive    Boolean     @default(true)
-  category    Category    @relation(fields: [categoryId], references: [id])
-  categoryId  String
-  orderItems  OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  brand       String?
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  packageType PackageType
+  /// Free-text package size label, e.g. "50kg", "1 Carton" — deliberately
+  /// not split into unit+quantity columns; the wholesale catalog has too
+  /// much variety (kg, litres, cartons of N) for a rigid structure to pay
+  /// for itself in Phase 1.
+  packageSize String
+
+  priceMinor         Int
+  previousPriceMinor Int?
+
+  stock             Int     @default(0)
+  lowStockThreshold Int     @default(10)
+  minOrderQuantity  Int     @default(1)
+  /// Cart quantities at or above this trigger "request a quote" instead of
+  /// instant checkout. Null means no such ceiling — always instantly
+  /// purchasable. See `lib/catalog/pricing.ts`.
+  bulkQuoteThreshold Int?
+
+  isActive   Boolean @default(true)
+  isFeatured Boolean @default(false)
+  imageUrl   String?
+
+  bulkPrices         BulkPrice[]
+  orderItems         OrderItem[]
+  quoteItems         QuoteItem[]
+  inventoryMovements InventoryMovement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId])
+  @@index([isActive])
 }
 
-/// A delivery zone with a flat fee. Real businesses price delivery by
-/// area, not a single hardcoded number — this table is the seam that lets
-/// that vary without a code change. Seed with real zones/fees before launch.
+/// A quantity-break price tier: ordering `minQuantity` or more of a product
+/// charges `pricePerUnitMinor` instead of `Product.priceMinor`. The
+/// applicable tier is the highest `minQuantity` at or below the cart
+/// quantity — see `resolveUnitPrice` in `lib/catalog/pricing.ts`.
+model BulkPrice {
+  id                String  @id @default(cuid())
+  product           Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId         String
+  minQuantity       Int
+  pricePerUnitMinor Int
+  createdAt         DateTime @default(now())
+
+  @@unique([productId, minQuantity])
+  @@index([productId])
+}
+
+// ---------------------------------------------------------------------------
+// Delivery
+// ---------------------------------------------------------------------------
+
+/// A flat delivery fee per Nigerian state. A state with no row here falls
+/// back to `businessConfig.delivery.defaultFeeMinor` — see `lib/delivery`.
+/// Modeled as a simple state->fee table for Phase 1; the delivery service
+/// function is the seam where fee-by-weight/quantity/package-size can be
+/// added later without touching call sites.
 model DeliveryZone {
-  id             String   @id @default(cuid())
-  name           String   @unique
-  feeMinor       Int
-  isActive       Boolean  @default(true)
-  orders         Order[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id        String   @id @default(cuid())
+  state     String   @unique
+  feeMinor  Int
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
 }
 
+// ---------------------------------------------------------------------------
+// Orders
+// ---------------------------------------------------------------------------
+
+/// Single state machine driving the order lifecycle (matches the flow the
+/// business actually follows). The admin UI presents this as two logical
+/// axes — "Payment status" and "Fulfillment status" — derived from this one
+/// field plus the Payment records (see `lib/orders/status.ts`), rather than
+/// storing two separate columns that could drift out of sync with each
+/// other or with reality.
 enum OrderStatus {
   PENDING_PAYMENT
+  PAYMENT_PROCESSING
   PAID
-  PAYMENT_FAILED
+  PROCESSING
+  READY_FOR_PICKUP
+  OUT_FOR_DELIVERY
+  COMPLETED
   CANCELLED
-  FULFILLED
 }
 
-/// A customer order. Money fields are snapshots computed server-side at
-/// creation time (never trusted from the client) so the order remains an
-/// accurate record even if product prices change later.
+enum FulfillmentMethod {
+  PICKUP
+  DELIVERY
+}
+
+/// A customer order. Customers never get accounts (see project brief) —
+/// they're identified by the contact details captured here at checkout.
+/// Money fields are snapshots computed server-side at creation time (never
+/// trusted from the client) so the order remains an accurate record even
+/// if product prices change later.
+///
+/// Stock is intentionally NOT decremented when an order is created — only
+/// once a payment is confirmed (see `lib/inventory/deductForOrder.ts`).
+/// Decrementing at creation would let an abandoned, never-paid checkout
+/// hold inventory hostage indefinitely.
 model Order {
-  id         String      @id @default(cuid())
-  orderNumber String     @unique
+  id          String @id @default(cuid())
+  orderNumber String @unique
 
-  customerName  String
-  customerPhone String
-  customerEmail String?
+  customerName     String
+  customerPhone    String
+  customerWhatsapp String
+  customerEmail    String?
 
-  deliveryZone   DeliveryZone @relation(fields: [deliveryZoneId], references: [id])
-  deliveryZoneId String
-  deliveryAddress String
+  fulfillmentMethod FulfillmentMethod
+  deliveryZone      DeliveryZone? @relation(fields: [deliveryZoneId], references: [id])
+  deliveryZoneId    String?
+  deliveryState     String?
+  deliveryCity      String?
+  deliveryAddress   String?
+  deliveryLandmark  String?
+  deliveryFeeMinor  Int           @default(0)
 
-  subtotalMinor    Int
-  deliveryFeeMinor Int
-  totalMinor       Int
+  subtotalMinor Int
+  totalMinor    Int
 
   status OrderStatus @default(PENDING_PAYMENT)
 
-  paymentProvider  String? // e.g. "paystack" | "demo"
-  paymentReference String? @unique
-  paidAt           DateTime?
+  /// Guards against double-restoring inventory if a cancellation is
+  /// processed more than once (e.g. a webhook retry).
+  stockRestored Boolean @default(false)
 
-  stockRestored Boolean @default(false) // guards against double-restoring inventory
-
-  items OrderItem[]
+  items              OrderItem[]
+  payments           Payment[]
+  inventoryMovements InventoryMovement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,19 +227,146 @@ model Order {
   @@index([customerPhone])
 }
 
-/// A line item snapshot — product name/price are copied at order time so
-/// the order stays accurate even if the product is later edited or removed.
+/// A line item snapshot — product name/SKU/price are copied at order time
+/// so the order stays accurate even if the product is later edited,
+/// repriced, or removed.
 model OrderItem {
-  id        String  @id @default(cuid())
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId   String
+  id      String @id @default(cuid())
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
   product   Product @relation(fields: [productId], references: [id])
   productId String
 
-  productName     String
-  unitPriceMinor  Int
-  quantity        Int
-  lineTotalMinor  Int
+  productName    String
+  productSku     String
+  packageSize    String
+  unitPriceMinor Int
+  quantity       Int
+  lineTotalMinor Int
 
   @@index([orderId])
+  @@index([productId])
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+/// One payment attempt against an order. Separate from Order (rather than
+/// fields on Order) because an order can have more than one attempt — a
+/// failed try followed by a retry — and each needs its own provider
+/// reference and status without overwriting the last attempt's record.
+model Payment {
+  id          String        @id @default(cuid())
+  order       Order         @relation(fields: [orderId], references: [id])
+  orderId     String
+  provider    String // "paystack" | "demo"
+  reference   String        @unique
+  amountMinor Int
+  status      PaymentStatus @default(PENDING)
+  paidAt      DateTime?
+  /// Raw provider response/event payload, kept for support/debugging —
+  /// never used as the source of truth for order state.
+  rawResponse Json?
+  createdAt   DateTime      @default(now())
+
+  @@index([orderId])
+}
+
+// ---------------------------------------------------------------------------
+// Inventory
+// ---------------------------------------------------------------------------
+
+enum InventoryMovementReason {
+  STOCK_RECEIVED
+  ORDER_PLACED
+  ORDER_CANCELLED
+  MANUAL_ADJUSTMENT
+  DAMAGED
+  CORRECTION
+}
+
+/// An immutable ledger entry for every stock change — the audit trail
+/// referenced throughout the project brief. Every place that changes
+/// `Product.stock` writes one of these in the same transaction, so total
+/// stock is always reconstructable and explainable from history.
+model InventoryMovement {
+  id               String                   @id @default(cuid())
+  product          Product                  @relation(fields: [productId], references: [id])
+  productId        String
+  quantityChange   Int // signed: +100 received, -5 sold
+  previousQuantity Int
+  newQuantity      Int
+  reason           InventoryMovementReason
+  note             String?
+
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+
+  admin   AdminUser? @relation(fields: [adminId], references: [id])
+  adminId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([orderId])
+}
+
+// ---------------------------------------------------------------------------
+// Quote requests
+// ---------------------------------------------------------------------------
+
+enum QuoteStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+/// A bulk-quote request. Negotiation happens over WhatsApp in Phase 1 — this
+/// model exists so the admin has a record of what was asked for and its
+/// status, not to run the negotiation itself.
+model QuoteRequest {
+  id          String @id @default(cuid())
+  quoteNumber String @unique
+
+  customerName     String
+  customerPhone    String
+  customerWhatsapp String
+  customerEmail    String?
+  deliveryState    String?
+  deliveryCity     String?
+  message          String?
+
+  status      QuoteStatus @default(NEW)
+  adminNotes  String?
+
+  handledBy   AdminUser? @relation("QuoteHandledBy", fields: [handledById], references: [id])
+  handledById String?
+
+  items QuoteItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model QuoteItem {
+  id             String       @id @default(cuid())
+  quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+  quoteRequestId String
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  productName String // snapshot
+  quantity    Int
+
+  @@index([quoteRequestId])
 }
