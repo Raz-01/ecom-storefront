@@ -1,22 +1,28 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import type { AdminRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { serverEnv } from "@/lib/env.server";
+import { authConfig } from "@/auth.config";
 
 /**
- * Admin authentication (Auth.js / NextAuth v5). Credentials-only — staff
- * log in with an email + password stored in `AdminUser`, hashed with
- * bcrypt. JWT session strategy: no Session/Account tables needed, since
- * those exist in Auth.js's schema for OAuth account-linking, which this
- * app has no use for. Customers never authenticate at all (guest
- * checkout only) — this is exclusively for `/admin`.
+ * Full admin authentication config (Auth.js / NextAuth v5) — Node.js
+ * runtime only. Credentials-only: staff log in with an email + password
+ * stored in `AdminUser`, hashed with bcrypt. JWT session strategy: no
+ * Session/Account tables needed, since those exist in Auth.js's schema for
+ * OAuth account-linking, which this app has no use for. Customers never
+ * authenticate at all (guest checkout only) — this is exclusively for
+ * `/admin`.
+ *
+ * Deliberately separate from `auth.config.ts`: this file's Credentials
+ * provider pulls in bcryptjs + Prisma, which must never end up in the Edge
+ * Middleware bundle (see that file's comment) — so `middleware.ts` imports
+ * `authConfig` directly, not this module.
  */
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   secret: serverEnv.authSecret,
   session: { strategy: "jwt" },
-  pages: { signIn: "/admin/login" },
   providers: [
     Credentials({
       credentials: {
@@ -40,22 +46,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.id = user.id!;
-        token.role = user.role;
-      }
-      return token;
-    },
-    session({ session, token }) {
-      // `token` here types looser than in the `jwt` callback above (its
-      // fields read as `unknown` despite the same JWT augmentation) — cast
-      // rather than fight the mismatch, since we control exactly what
-      // `jwt()` put on it.
-      session.user.id = token.id as string;
-      session.user.role = token.role as AdminRole;
-      return session;
-    },
-  },
 });
