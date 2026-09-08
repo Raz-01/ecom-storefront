@@ -72,6 +72,18 @@ their machinery early.
 - **Roles**: `AdminRole` enum (OWNER/ADMIN/WAREHOUSE_STAFF), not a
   Role/Permission table — 3 known roles; a new one later is one enum
   value + one entry in the permissions map, not a migration.
+- **Design system**: light-first, deliberately — no `dark:` variants
+  anywhere, on purpose (a food-wholesale business site, not a dev tool;
+  see the redesign brief). Tokens in `globals.css`: warm off-white
+  background, warm charcoal text, Tailwind's `stone` scale (not `zinc`)
+  for neutrals, brand green (`bg-brand-primary` / `-dark`) as the one
+  accent color, a separate `bg-whatsapp` green for WhatsApp affordances so
+  they read as "opens WhatsApp" rather than "primary action". No real
+  product photography — `src/components/site/icons/CategoryIllustration.tsx`
+  holds hand-drawn SVG illustrations per category, used as the fallback
+  whenever `Product.imageUrl` is null (real photos are a data change any
+  time, not a code change). `LogoMark`/`Logo` in `src/components/site/Logo.tsx`
+  is a simple temporary brand mark, meant to be replaced.
 
 ## Environment quirk (read before debugging "the DB is unreachable")
 
@@ -109,9 +121,21 @@ any real launch): `owner@ilorinbulkmart.demo` / `Owner123!`,
 `admin@ilorinbulkmart.demo` / `Admin123!`,
 `warehouse@ilorinbulkmart.demo` / `Warehouse123!`.
 
-Not yet done: the DB was reset (see "Environment quirk" above — old and
-new schemas collided) and needs `prisma migrate deploy` + the seed route
-run again post-reset; Docker (brief explicitly wants this taught as a
-distinct later step, not bundled in); a real Paystack account (currently
-demo-mode payments only, by design); real business contact details in
-`business.config.ts` (currently placeholders).
+The DB reset mentioned in "Environment quirk" above is resolved — the
+schema was reapplied and reseeded on Vercel's network; the live site has
+real seeded catalog/order/quote data.
+
+Two redesign passes are done (see git log: "Redesign pass 1/2") — light-
+first palette, homepage hero, product cards/detail, cart, checkout
+sectioning, footer, floating WhatsApp button, admin sidebar/topbar/
+dashboard chips. Verified live: `brand-primary` classes present, zero
+`bg-stone-900` black chips, category illustrations rendering.
+
+Not yet done: automated tests (the brief lists specific business-logic
+cases — inventory-only-decrements-on-payment, no negative stock, server-
+recalculated totals, role-based access — none have a regression suite
+yet); Docker (brief explicitly wants this taught as a distinct later
+step, not bundled in); a real Paystack account (currently demo-mode
+payments only, by design); real business contact details in
+`business.config.ts` (currently placeholders); further design polish the
+user may call out after reviewing the live redesign.
