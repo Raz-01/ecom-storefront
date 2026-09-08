@@ -8,10 +8,11 @@ import { businessConfig } from "@/lib/business.config";
  * handled by the caller retrying on a unique-constraint violation — see
  * `withUniqueReferenceRetry`.
  */
-export function generateReferenceCode(date: Date = new Date()): string {
+export function generateReferenceCode(segment?: string, date: Date = new Date()): string {
   const datePart = date.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
   const randomPart = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `${businessConfig.referenceCodePrefix}-${datePart}-${randomPart}`;
+  const prefix = segment ? `${businessConfig.referenceCodePrefix}-${segment}` : businessConfig.referenceCodePrefix;
+  return `${prefix}-${datePart}-${randomPart}`;
 }
 
 /**
@@ -19,16 +20,19 @@ export function generateReferenceCode(date: Date = new Date()): string {
  * constraint collision (Prisma error P2002 on the given field) — cheap
  * insurance against the rare case of two requests generating the same
  * random suffix in the same second, without needing a coordinated sequence.
+ * `segment` distinguishes reference series, e.g. "Q" for quote numbers vs
+ * plain order numbers.
  */
 export async function withUniqueReferenceRetry<T>(
   create: (referenceCode: string) => Promise<T>,
   field: string,
+  segment?: string,
   attempts = 3,
 ): Promise<T> {
   let lastError: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
-      return await create(generateReferenceCode());
+      return await create(generateReferenceCode(segment));
     } catch (err) {
       lastError = err;
       if (!isUniqueConstraintError(err, field)) throw err;

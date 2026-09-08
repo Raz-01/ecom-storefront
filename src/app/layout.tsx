@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { businessConfig } from "@/lib/business.config";
-import { SiteHeader } from "@/components/site/SiteHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,16 +18,11 @@ export const metadata: Metadata = {
   description: businessConfig.description,
 };
 
+/** Bare shell only — the storefront header lives in `(site)/layout.tsx` and the admin chrome in `admin/(protected)/layout.tsx`, so neither bleeds into the other. */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black">
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">{children}</div>
-      </body>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black">{children}</body>
     </html>
   );
 }
