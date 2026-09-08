@@ -89,11 +89,29 @@ the same reason — seeding ran on Vercel's network, not locally.
 
 ## Where things stand / what's next
 
-Foundation (schema, business config, core services: pricing, delivery,
-inventory ledger, order creation/payment confirmation/cancellation,
-WhatsApp links, seed data) is in place. Still to build, roughly in this
-order: public storefront pages (shop/category/product/cart/checkout/quote
-request/order confirmation), Auth.js admin login + route protection,
-admin dashboard (overview analytics, products, inventory, orders, quotes,
-staff). See `docs/PRODUCT_BRIEF.md`'s "Development order" section for the
-full sequence this is following.
+Phase 1 is functionally complete and passes `tsc --noEmit` + `next build`
++ `eslint` clean:
+
+- **Storefront**: home, shop (category/search filters), product detail
+  (bulk pricing table, quote-required state), cart, checkout
+  (pickup/delivery, live delivery-fee preview, Paystack/demo payment),
+  order confirmation (WhatsApp continuation), bulk quote request +
+  confirmation.
+- **Admin**: Auth.js credentials login, middleware-protected `/admin/**`,
+  role-gated dashboard (revenue/order/inventory stats, trend chart, best
+  sellers, sales by category), product CRUD, inventory (adjust stock +
+  movement history), orders (status updates, payment/fulfillment views
+  kept visually separate), quotes (status + admin notes), staff (Owner-
+  only CRUD).
+
+Demo admin logins (seeded — see `src/lib/seed/runSeed.ts`, rotate before
+any real launch): `owner@ilorinbulkmart.demo` / `Owner123!`,
+`admin@ilorinbulkmart.demo` / `Admin123!`,
+`warehouse@ilorinbulkmart.demo` / `Warehouse123!`.
+
+Not yet done: the DB was reset (see "Environment quirk" above — old and
+new schemas collided) and needs `prisma migrate deploy` + the seed route
+run again post-reset; Docker (brief explicitly wants this taught as a
+distinct later step, not bundled in); a real Paystack account (currently
+demo-mode payments only, by design); real business contact details in
+`business.config.ts` (currently placeholders).
