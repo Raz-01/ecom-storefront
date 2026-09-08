@@ -7,7 +7,7 @@ export function DashboardTrendChart({ data }: { data: { date: string; revenueMin
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-zinc-200 dark:stroke-zinc-800" />
+        <CartesianGrid strokeDasharray="3 3" className="stroke-stone-200" />
         <XAxis dataKey="date" tick={{ fontSize: 11 }} tickFormatter={(v: string) => v.slice(5)} />
         <YAxis yAxisId="revenue" tick={{ fontSize: 11 }} tickFormatter={(v: number) => formatMoney(v).replace(/\.00$/, "")} width={70} />
         <YAxis yAxisId="orders" orientation="right" tick={{ fontSize: 11 }} allowDecimals={false} width={40} />

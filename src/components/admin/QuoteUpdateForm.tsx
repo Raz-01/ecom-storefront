@@ -26,7 +26,7 @@ export function QuoteUpdateForm({ quoteNumber, currentStatus, currentNotes }: { 
       <FormField label="Notes" htmlFor="adminNotes">
         <Textarea id="adminNotes" name="adminNotes" rows={3} defaultValue={currentNotes} placeholder="What was agreed, next steps, etc." />
       </FormField>
-      {state.error && <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>}
+      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
       <Button type="submit" size="sm" disabled={isPending} className="self-start">
         {isPending ? "Saving…" : "Save"}
       </Button>

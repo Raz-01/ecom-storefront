@@ -21,11 +21,11 @@ export function AdjustStockForm({ productId }: { productId: string }) {
 
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-2">
-      <div className="flex rounded-md border border-zinc-300 dark:border-zinc-700">
-        <button type="button" onClick={() => setDirection("add")} className={`px-2 py-1.5 text-xs font-medium ${direction === "add" ? "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-400" : ""}`}>
+      <div className="flex rounded-md border border-stone-300">
+        <button type="button" onClick={() => setDirection("add")} className={`px-2 py-1.5 text-xs font-medium ${direction === "add" ? "bg-green-100 text-green-800" : ""}`}>
           Add
         </button>
-        <button type="button" onClick={() => setDirection("remove")} className={`px-2 py-1.5 text-xs font-medium ${direction === "remove" ? "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400" : ""}`}>
+        <button type="button" onClick={() => setDirection("remove")} className={`px-2 py-1.5 text-xs font-medium ${direction === "remove" ? "bg-red-100 text-red-800" : ""}`}>
           Remove
         </button>
       </div>
@@ -45,7 +45,7 @@ export function AdjustStockForm({ productId }: { productId: string }) {
       <Button type="submit" size="sm" disabled={isPending}>
         {isPending ? "Saving…" : "Apply"}
       </Button>
-      {state.error && <p className="w-full text-xs text-red-600 dark:text-red-400">{state.error}</p>}
+      {state.error && <p className="w-full text-xs text-red-600">{state.error}</p>}
     </form>
   );
 }

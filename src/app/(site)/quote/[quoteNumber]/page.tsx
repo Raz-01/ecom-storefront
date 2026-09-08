@@ -18,14 +18,14 @@ export default async function QuoteConfirmationPage({ params }: PageProps<"/quot
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
-      <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950">
+      <div className="rounded-lg border border-green-200 bg-green-50 p-4">
         <h1 className="text-lg font-semibold">Quote request received</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">Reference #{quote.quoteNumber}. We&apos;ll get back to you shortly — sending it on WhatsApp gets you a faster response.</p>
+        <p className="mt-1 text-sm text-stone-600">Reference #{quote.quoteNumber}. We&apos;ll get back to you shortly — sending it on WhatsApp gets you a faster response.</p>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="rounded-lg border border-stone-200 p-4">
         <h2 className="mb-2 text-sm font-semibold">Requested products</h2>
-        <ul className="flex flex-col gap-1.5 text-sm text-zinc-600 dark:text-zinc-400">
+        <ul className="flex flex-col gap-1.5 text-sm text-stone-600">
           {quote.items.map((item) => (
             <li key={item.id}>
               {item.quantity}× {item.productName}

@@ -34,13 +34,13 @@ export function BulkPriceTable({ basePriceMinor, tiers, bulkQuoteThreshold }: { 
   }
 
   return (
-    <div className="rounded-md border border-zinc-200 dark:border-zinc-800">
-      <p className="border-b border-zinc-200 px-3 py-2 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800">Bulk pricing</p>
+    <div className="rounded-md border border-stone-200">
+      <p className="border-b border-stone-200 px-3 py-2 text-xs font-medium uppercase tracking-wide text-stone-500">Bulk pricing</p>
       <table className="w-full text-sm">
         <tbody>
           {rows.map((row) => (
-            <tr key={row.range} className="border-b border-zinc-100 last:border-0 dark:border-zinc-900">
-              <td className="px-3 py-2 text-zinc-600 dark:text-zinc-400">{row.range} units</td>
+            <tr key={row.range} className="border-b border-stone-100 last:border-0">
+              <td className="px-3 py-2 text-stone-600">{row.range} units</td>
               <td className="px-3 py-2 text-right font-medium">{row.price}</td>
             </tr>
           ))}

@@ -58,7 +58,7 @@ export function CheckoutForm() {
     return (
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-4 px-4 py-16 text-center sm:px-6">
         <h1 className="text-xl font-semibold">Your cart is empty</h1>
-        <Link href="/shop" className="text-sm font-medium text-brand-primary-dark underline dark:text-brand-primary">
+        <Link href="/shop" className="text-sm font-medium text-brand-primary-dark underline">
           Continue shopping
         </Link>
       </div>
@@ -74,11 +74,11 @@ export function CheckoutForm() {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 md:flex-row-reverse">
-      <aside className="flex-shrink-0 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800 md:w-80">
+      <aside className="flex-shrink-0 rounded-lg border border-stone-200 p-4 md:w-80">
         <h2 className="mb-3 text-sm font-semibold">Order summary</h2>
         <ul className="flex flex-col gap-1.5 text-sm">
           {display.map((line) => (
-            <li key={line.productId} className="flex justify-between gap-2 text-zinc-600 dark:text-zinc-400">
+            <li key={line.productId} className="flex justify-between gap-2 text-stone-600">
               <span>
                 {line.quantity}× {line.name} <span className="text-xs">({line.packageSize})</span>
                 {line.priceResolution.kind === "priced" && line.priceResolution.appliedTier && <Badge tone="brand" className="ml-1">Bulk</Badge>}
@@ -87,12 +87,12 @@ export function CheckoutForm() {
             </li>
           ))}
         </ul>
-        <div className="mt-3 flex flex-col gap-1 border-t border-zinc-200 pt-3 text-sm dark:border-zinc-800">
-          <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
+        <div className="mt-3 flex flex-col gap-1 border-t border-stone-200 pt-3 text-sm">
+          <div className="flex justify-between text-stone-600">
             <span>Subtotal</span>
             <span>{formatMoney(subtotalMinor)}</span>
           </div>
-          <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
+          <div className="flex justify-between text-stone-600">
             <span>Delivery</span>
             <span>{fulfillmentMethod === "PICKUP" ? "Free (pickup)" : deliveryState ? formatMoney(deliveryFeeMinor) : "—"}</span>
           </div>
@@ -116,8 +116,8 @@ export function CheckoutForm() {
               onClick={() => setFulfillmentMethod(method)}
               className={`flex-1 rounded-md border px-4 py-2 text-sm font-medium ${
                 fulfillmentMethod === method
-                  ? "border-brand-primary bg-brand-primary/10 text-brand-primary-dark dark:text-brand-primary"
-                  : "border-zinc-300 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400"
+                  ? "border-brand-primary bg-brand-primary/10 text-brand-primary-dark"
+                  : "border-stone-300 text-stone-600"
               }`}
             >
               {method === "PICKUP" ? "Pickup from warehouse" : "Delivery"}
@@ -172,13 +172,13 @@ export function CheckoutForm() {
           </>
         )}
 
-        {state.error && <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>}
+        {state.error && <p className="text-sm text-red-600">{state.error}</p>}
 
         <Button type="submit" size="lg" disabled={isPending || hasBlockingIssue}>
           {isPending ? "Placing order…" : `Pay ${formatMoney(totalMinor)}`}
         </Button>
         {hasBlockingIssue && (
-          <p className="text-sm text-red-600 dark:text-red-400">
+          <p className="text-sm text-red-600">
             Some items in your cart need attention —{" "}
             <Link href="/cart" className="underline">
               go back to your cart

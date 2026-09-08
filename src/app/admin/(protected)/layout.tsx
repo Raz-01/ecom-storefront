@@ -15,7 +15,7 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
   const session = await requireAdminSession();
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="flex min-h-screen bg-stone-50">
       <AdminSidebar role={session.user.role} />
       <div className="flex flex-1 flex-col">
         <AdminTopBar user={session.user} />

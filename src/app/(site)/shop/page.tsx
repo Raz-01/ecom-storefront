@@ -40,7 +40,7 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
         <Link
           href="/shop"
           className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-            !categorySlug ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900" : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            !categorySlug ? "bg-stone-900 text-white" : "bg-stone-100 text-stone-700 hover:bg-stone-200"
           }`}
         >
           All
@@ -51,8 +51,8 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
             href={`/shop?category=${category.slug}`}
             className={`rounded-full px-3 py-1.5 text-sm font-medium ${
               categorySlug === category.slug
-                ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                ? "bg-stone-900 text-white"
+                : "bg-stone-100 text-stone-700 hover:bg-stone-200"
             }`}
           >
             {category.name}
@@ -62,8 +62,8 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
 
       {products.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">No products found.</p>
-          <p className="mt-1 text-sm text-zinc-500">Try another search or browse our categories.</p>
+          <p className="text-sm font-medium text-stone-700">No products found.</p>
+          <p className="mt-1 text-sm text-stone-500">Try another search or browse our categories.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">

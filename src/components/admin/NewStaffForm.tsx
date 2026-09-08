@@ -28,7 +28,7 @@ export function NewStaffForm() {
           <option value="WAREHOUSE_STAFF">Warehouse Staff</option>
         </Select>
       </FormField>
-      {state.error && <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>}
+      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
       <Button type="submit" disabled={isPending} className="self-start">
         {isPending ? "Creating…" : "Create account"}
       </Button>

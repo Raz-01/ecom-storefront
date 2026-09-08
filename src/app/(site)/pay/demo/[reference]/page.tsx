@@ -19,18 +19,18 @@ export default async function DemoPaymentPage({ params }: PageProps<"/pay/demo/[
   if (payment.status !== "PENDING") {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center sm:px-6">
-        <p className="text-sm text-zinc-500">This payment attempt has already been processed.</p>
+        <p className="text-sm text-stone-500">This payment attempt has already been processed.</p>
       </main>
     );
   }
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6 px-4 py-16 sm:px-6">
-      <div className="w-full rounded-lg border border-dashed border-zinc-300 p-6 text-center dark:border-zinc-700">
-        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-zinc-500">Demo payment</p>
+      <div className="w-full rounded-lg border border-dashed border-stone-300 p-6 text-center">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-stone-500">Demo payment</p>
         <h1 className="text-lg font-semibold">Pay {formatMoney(payment.amountMinor)}</h1>
-        <p className="mt-1 text-sm text-zinc-500">Order #{payment.order.orderNumber}</p>
-        <p className="mt-4 text-xs text-zinc-500">
+        <p className="mt-1 text-sm text-stone-500">Order #{payment.order.orderNumber}</p>
+        <p className="mt-4 text-xs text-stone-500">
           No real payment provider is configured for {businessConfig.name}, so this simulates Paystack&apos;s checkout. Choose an outcome below.
         </p>
         <div className="mt-6 flex flex-col gap-3">
@@ -40,7 +40,7 @@ export default async function DemoPaymentPage({ params }: PageProps<"/pay/demo/[
             </Button>
           </form>
           <form action={simulateFailure.bind(null, reference)}>
-            <Button type="submit" variant="outline" className="w-full border-red-300 text-red-600 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950">
+            <Button type="submit" variant="outline" className="w-full border-red-300 text-red-600 hover:bg-red-50">
               Simulate failed payment
             </Button>
           </form>

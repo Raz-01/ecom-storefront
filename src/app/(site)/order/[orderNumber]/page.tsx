@@ -44,7 +44,7 @@ export default async function OrderConfirmationPage({ params }: PageProps<"/orde
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{businessConfig.name}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-stone-500">{businessConfig.name}</p>
           <h1 className="text-lg font-semibold">Order #{order.orderNumber}</h1>
         </div>
         <div className="flex gap-2">
@@ -56,14 +56,14 @@ export default async function OrderConfirmationPage({ params }: PageProps<"/orde
       <div
         className={`rounded-lg border p-4 ${
           status.tone === "success"
-            ? "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950"
+            ? "border-green-200 bg-green-50"
             : status.tone === "error"
-              ? "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950"
-              : "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950"
+              ? "border-red-200 bg-red-50"
+              : "border-amber-200 bg-amber-50"
         }`}
       >
         <h2 className="text-base font-semibold">{status.title}</h2>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{status.body}</p>
+        <p className="mt-1 text-sm text-stone-600">{status.body}</p>
         {canRetryPayment && (
           <form action={retryPayment.bind(null, order.orderNumber)} className="no-print mt-3">
             <button type="submit" className={buttonClasses("primary", "sm")}>
@@ -73,14 +73,14 @@ export default async function OrderConfirmationPage({ params }: PageProps<"/orde
         )}
       </div>
 
-      <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="rounded-lg border border-stone-200 p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold">Order details</h2>
-          <span className="text-xs text-zinc-500">{order.createdAt.toLocaleString(businessConfig.locale)}</span>
+          <span className="text-xs text-stone-500">{order.createdAt.toLocaleString(businessConfig.locale)}</span>
         </div>
         <ul className="flex flex-col gap-1.5 text-sm">
           {order.items.map((item) => (
-            <li key={item.id} className="flex justify-between text-zinc-600 dark:text-zinc-400">
+            <li key={item.id} className="flex justify-between text-stone-600">
               <span>
                 {item.quantity}× {item.productName} <span className="text-xs">({item.packageSize})</span>
               </span>
@@ -88,12 +88,12 @@ export default async function OrderConfirmationPage({ params }: PageProps<"/orde
             </li>
           ))}
         </ul>
-        <div className="mt-3 flex flex-col gap-1 border-t border-zinc-200 pt-3 text-sm dark:border-zinc-800">
-          <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
+        <div className="mt-3 flex flex-col gap-1 border-t border-stone-200 pt-3 text-sm">
+          <div className="flex justify-between text-stone-600">
             <span>Subtotal</span>
             <span>{formatMoney(order.subtotalMinor)}</span>
           </div>
-          <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
+          <div className="flex justify-between text-stone-600">
             <span>{order.fulfillmentMethod === "PICKUP" ? "Pickup" : "Delivery"}</span>
             <span>{order.fulfillmentMethod === "PICKUP" ? "Free" : formatMoney(order.deliveryFeeMinor)}</span>
           </div>
@@ -103,12 +103,12 @@ export default async function OrderConfirmationPage({ params }: PageProps<"/orde
           </div>
         </div>
         {order.fulfillmentMethod === "DELIVERY" ? (
-          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-3 text-sm text-stone-600">
             Delivering to: {order.deliveryAddress}, {order.deliveryCity}, {order.deliveryState}
             {order.deliveryLandmark ? ` (near ${order.deliveryLandmark})` : ""}
           </p>
         ) : (
-          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">Pickup from: {businessConfig.location.address}</p>
+          <p className="mt-3 text-sm text-stone-600">Pickup from: {businessConfig.location.address}</p>
         )}
       </div>
 

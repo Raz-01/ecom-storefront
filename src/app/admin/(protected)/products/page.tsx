@@ -40,11 +40,11 @@ export default async function AdminProductsPage() {
                 <Link href={`/admin/products/${product.id}`} className="font-medium hover:underline">
                   {product.name}
                 </Link>
-                <div className="text-xs text-zinc-500">
+                <div className="text-xs text-stone-500">
                   {product.sku} · {product.packageSize}
                 </div>
               </Td>
-              <Td className="text-zinc-500">{product.category.name}</Td>
+              <Td className="text-stone-500">{product.category.name}</Td>
               <Td className="text-right">{formatMoney(product.priceMinor)}</Td>
               <Td className="text-right">{product.stock}</Td>
               <Td className="flex flex-wrap gap-1">

@@ -25,7 +25,7 @@ export function OrderStatusForm({ orderNumber, currentStatus }: { orderNumber: s
       <Button type="submit" size="sm" disabled={isPending}>
         {isPending ? "Updating…" : "Update status"}
       </Button>
-      {state.error && <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>}
+      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
     </form>
   );
 }

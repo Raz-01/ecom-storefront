@@ -30,7 +30,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps<"/admin
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Order #{order.orderNumber}</h1>
-          <p className="text-sm text-zinc-500">{order.createdAt.toLocaleString()}</p>
+          <p className="text-sm text-stone-500">{order.createdAt.toLocaleString()}</p>
         </div>
         <div className="flex gap-2">
           <PaymentStatusBadge status={paymentStatus} />
@@ -48,18 +48,18 @@ export default async function AdminOrderDetailPage({ params }: PageProps<"/admin
               {order.items.map((item) => (
                 <li key={item.id} className="flex justify-between">
                   <span>
-                    {item.quantity}× {item.productName} <span className="text-xs text-zinc-500">({item.packageSize}, SKU {item.productSku})</span>
+                    {item.quantity}× {item.productName} <span className="text-xs text-stone-500">({item.packageSize}, SKU {item.productSku})</span>
                   </span>
                   <span>{formatMoney(item.lineTotalMinor)}</span>
                 </li>
               ))}
             </ul>
-            <div className="mt-3 flex flex-col gap-1 border-t border-zinc-200 pt-3 text-sm dark:border-zinc-800">
-              <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
+            <div className="mt-3 flex flex-col gap-1 border-t border-stone-200 pt-3 text-sm">
+              <div className="flex justify-between text-stone-600">
                 <span>Subtotal</span>
                 <span>{formatMoney(order.subtotalMinor)}</span>
               </div>
-              <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
+              <div className="flex justify-between text-stone-600">
                 <span>{order.fulfillmentMethod === "PICKUP" ? "Pickup" : "Delivery"}</span>
                 <span>{formatMoney(order.deliveryFeeMinor)}</span>
               </div>
@@ -78,8 +78,8 @@ export default async function AdminOrderDetailPage({ params }: PageProps<"/admin
             </CardHeader>
             <CardContent className="flex flex-col gap-1 text-sm">
               <span className="font-medium">{order.customerName}</span>
-              <span className="text-zinc-500">{order.customerPhone}</span>
-              {order.customerEmail && <span className="text-zinc-500">{order.customerEmail}</span>}
+              <span className="text-stone-500">{order.customerPhone}</span>
+              {order.customerEmail && <span className="text-stone-500">{order.customerEmail}</span>}
               <a href={buildCustomerContactWhatsAppLink(order.customerWhatsapp, whatsappMessage)} target="_blank" rel="noopener noreferrer" className={`mt-2 ${buttonClasses("whatsapp", "sm")}`}>
                 Contact on WhatsApp
               </a>
@@ -90,7 +90,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps<"/admin
             <CardHeader>
               <CardTitle>{order.fulfillmentMethod === "PICKUP" ? "Pickup" : "Delivery"}</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-zinc-600 dark:text-zinc-400">
+            <CardContent className="text-sm text-stone-600">
               {order.fulfillmentMethod === "PICKUP" ? (
                 <p>Collecting from {businessConfig.location.address}</p>
               ) : (
@@ -110,13 +110,13 @@ export default async function AdminOrderDetailPage({ params }: PageProps<"/admin
               <ul className="flex flex-col gap-2 text-sm">
                 {order.payments.map((payment) => (
                   <li key={payment.id} className="flex items-center justify-between">
-                    <span className="text-zinc-600 dark:text-zinc-400">
+                    <span className="text-stone-600">
                       {payment.provider} · {payment.createdAt.toLocaleString()}
                     </span>
                     <Badge tone={payment.status === "SUCCESS" ? "success" : payment.status === "FAILED" ? "danger" : "warning"}>{payment.status}</Badge>
                   </li>
                 ))}
-                {order.payments.length === 0 && <p className="text-zinc-500">No payment attempts yet.</p>}
+                {order.payments.length === 0 && <p className="text-stone-500">No payment attempts yet.</p>}
               </ul>
             </CardContent>
           </Card>
@@ -130,7 +130,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps<"/admin
                 {canChangeFulfillment ? (
                   <OrderStatusForm orderNumber={order.orderNumber} currentStatus={order.status === "PAID" ? "PROCESSING" : order.status} />
                 ) : (
-                  <p className="text-sm text-zinc-500">This order isn&apos;t paid yet — fulfillment status can&apos;t be changed until payment is confirmed.</p>
+                  <p className="text-sm text-stone-500">This order isn&apos;t paid yet — fulfillment status can&apos;t be changed until payment is confirmed.</p>
                 )}
               </CardContent>
             </Card>

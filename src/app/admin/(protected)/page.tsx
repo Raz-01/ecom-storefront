@@ -53,13 +53,13 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Dashboard</h1>
-        <div className="flex gap-1 rounded-full border border-zinc-200 p-1 dark:border-zinc-800">
+        <div className="flex gap-1 rounded-full border border-stone-200 p-1">
           {RANGE_OPTIONS.map((opt) => (
             <Link
               key={opt.value}
               href={`/admin?range=${opt.value}`}
               className={`rounded-full px-3 py-1 text-xs font-medium ${
-                opt.value === range.value ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900" : "text-zinc-600 dark:text-zinc-400"
+                opt.value === range.value ? "bg-stone-900 text-white" : "text-stone-600"
               }`}
             >
               {opt.label}
@@ -106,13 +106,13 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
           </CardHeader>
           <CardContent>
             {bestSellers.length === 0 ? (
-              <p className="text-sm text-zinc-500">No sales in this period yet.</p>
+              <p className="text-sm text-stone-500">No sales in this period yet.</p>
             ) : (
               <ul className="flex flex-col gap-2 text-sm">
                 {bestSellers.map((p) => (
                   <li key={p.productId} className="flex justify-between">
                     <span>{p.productName}</span>
-                    <span className="text-zinc-500">
+                    <span className="text-stone-500">
                       {p.unitsSold} sold{canViewFinancial ? ` · ${formatMoney(p.revenueMinor)}` : ""}
                     </span>
                   </li>
@@ -128,13 +128,13 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
           </CardHeader>
           <CardContent>
             {lowStockProducts.length === 0 ? (
-              <p className="text-sm text-zinc-500">Everything is healthily stocked.</p>
+              <p className="text-sm text-stone-500">Everything is healthily stocked.</p>
             ) : (
               <ul className="flex flex-col gap-2 text-sm">
                 {lowStockProducts.map((p) => (
                   <li key={p.id} className="flex items-center justify-between">
                     <Link href="/admin/inventory" className="hover:underline">
-                      {p.name} <span className="text-xs text-zinc-500">({p.packageSize})</span>
+                      {p.name} <span className="text-xs text-stone-500">({p.packageSize})</span>
                     </Link>
                     <Badge tone={p.stock <= 0 ? "danger" : "warning"}>{p.stock <= 0 ? "Out of stock" : `${p.stock} left`}</Badge>
                   </li>
@@ -151,13 +151,13 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
             </CardHeader>
             <CardContent>
               {salesByCategory.length === 0 ? (
-                <p className="text-sm text-zinc-500">No sales in this period yet.</p>
+                <p className="text-sm text-stone-500">No sales in this period yet.</p>
               ) : (
                 <ul className="flex flex-col gap-2 text-sm">
                   {salesByCategory.map((c) => (
                     <li key={c.category} className="flex justify-between">
                       <span>{c.category}</span>
-                      <span className="text-zinc-500">{formatMoney(c.revenueMinor)}</span>
+                      <span className="text-stone-500">{formatMoney(c.revenueMinor)}</span>
                     </li>
                   ))}
                 </ul>
@@ -174,31 +174,31 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex justify-between">
                 <span>Pending payment</span>
-                <span className="text-zinc-500">{orderCounts.pendingPayment}</span>
+                <span className="text-stone-500">{orderCounts.pendingPayment}</span>
               </li>
               <li className="flex justify-between">
                 <span>Paid</span>
-                <span className="text-zinc-500">{orderCounts.paid}</span>
+                <span className="text-stone-500">{orderCounts.paid}</span>
               </li>
               <li className="flex justify-between">
                 <span>Processing</span>
-                <span className="text-zinc-500">{orderCounts.processing}</span>
+                <span className="text-stone-500">{orderCounts.processing}</span>
               </li>
               <li className="flex justify-between">
                 <span>Ready for pickup</span>
-                <span className="text-zinc-500">{orderCounts.readyForPickup}</span>
+                <span className="text-stone-500">{orderCounts.readyForPickup}</span>
               </li>
               <li className="flex justify-between">
                 <span>Out for delivery</span>
-                <span className="text-zinc-500">{orderCounts.outForDelivery}</span>
+                <span className="text-stone-500">{orderCounts.outForDelivery}</span>
               </li>
               <li className="flex justify-between">
                 <span>Completed</span>
-                <span className="text-zinc-500">{orderCounts.completed}</span>
+                <span className="text-stone-500">{orderCounts.completed}</span>
               </li>
               <li className="flex justify-between">
                 <span>Cancelled</span>
-                <span className="text-zinc-500">{orderCounts.cancelled}</span>
+                <span className="text-stone-500">{orderCounts.cancelled}</span>
               </li>
             </ul>
           </CardContent>

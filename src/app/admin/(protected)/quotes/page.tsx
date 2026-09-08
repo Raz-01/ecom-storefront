@@ -66,10 +66,10 @@ export default async function AdminQuotesPage({ searchParams }: PageProps<"/admi
               </Td>
               <Td>
                 <div>{quote.customerName}</div>
-                <div className="text-xs text-zinc-500">{quote.customerPhone}</div>
+                <div className="text-xs text-stone-500">{quote.customerPhone}</div>
               </Td>
-              <Td className="text-xs text-zinc-500">{quote.items.length} product(s)</Td>
-              <Td className="text-xs text-zinc-500">{quote.createdAt.toLocaleDateString()}</Td>
+              <Td className="text-xs text-stone-500">{quote.items.length} product(s)</Td>
+              <Td className="text-xs text-stone-500">{quote.createdAt.toLocaleDateString()}</Td>
               <Td>
                 <Badge tone={STATUS_TONE[quote.status]}>{quote.status}</Badge>
               </Td>
@@ -77,7 +77,7 @@ export default async function AdminQuotesPage({ searchParams }: PageProps<"/admi
           ))}
           {quotes.length === 0 && (
             <Tr>
-              <Td colSpan={5} className="py-8 text-center text-sm text-zinc-500">
+              <Td colSpan={5} className="py-8 text-center text-sm text-stone-500">
                 No quote requests match this filter.
               </Td>
             </Tr>

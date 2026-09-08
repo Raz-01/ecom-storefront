@@ -49,13 +49,13 @@ export function QuoteRequestForm({ products, initialLine }: { products: ProductO
               aria-label="Quantity"
             />
             {lines.length > 1 && (
-              <button type="button" onClick={() => removeLine(index)} className="text-xs text-zinc-500 underline">
+              <button type="button" onClick={() => removeLine(index)} className="text-xs text-stone-500 underline">
                 Remove
               </button>
             )}
           </div>
         ))}
-        <button type="button" onClick={addLine} className="self-start text-sm font-medium text-brand-primary-dark underline dark:text-brand-primary">
+        <button type="button" onClick={addLine} className="self-start text-sm font-medium text-brand-primary-dark underline">
           + Add another product
         </button>
       </div>
@@ -101,7 +101,7 @@ export function QuoteRequestForm({ products, initialLine }: { products: ProductO
         <Textarea id="message" name="message" rows={3} maxLength={2000} />
       </FormField>
 
-      {state.error && <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>}
+      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
 
       <Button type="submit" size="lg" disabled={isPending || lines.length === 0}>
         {isPending ? "Sending…" : "Request quote"}

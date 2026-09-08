@@ -75,9 +75,9 @@ export default async function AdminOrdersPage({ searchParams }: PageProps<"/admi
               </Td>
               <Td>
                 <div>{order.customerName}</div>
-                <div className="text-xs text-zinc-500">{order.customerPhone}</div>
+                <div className="text-xs text-stone-500">{order.customerPhone}</div>
               </Td>
-              <Td className="text-xs text-zinc-500">{order.createdAt.toLocaleDateString()}</Td>
+              <Td className="text-xs text-stone-500">{order.createdAt.toLocaleDateString()}</Td>
               <Td>
                 <PaymentStatusBadge status={getDisplayPaymentStatus(order, order.payments[0]?.status)} />
               </Td>
@@ -89,7 +89,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps<"/admi
           ))}
           {orders.length === 0 && (
             <Tr>
-              <Td colSpan={6} className="py-8 text-center text-sm text-zinc-500">
+              <Td colSpan={6} className="py-8 text-center text-sm text-stone-500">
                 No orders match this filter.
               </Td>
             </Tr>

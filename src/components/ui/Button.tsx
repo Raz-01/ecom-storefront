@@ -2,21 +2,24 @@ import { forwardRef } from "react";
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils/cn";
 
+/**
+ * The button system called for in the redesign brief: a green primary
+ * action, a light/outlined secondary, a red danger, and a distinct
+ * WhatsApp treatment (its own recognizable green, not the brand green —
+ * it signals "this opens WhatsApp", not "this is our main action").
+ */
 const VARIANT_CLASSES = {
-  primary: "bg-brand-primary text-white hover:bg-brand-primary-dark disabled:bg-zinc-300 disabled:text-zinc-500 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600",
-  secondary:
-    "bg-zinc-900 text-white hover:bg-zinc-700 disabled:bg-zinc-300 disabled:text-zinc-500 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600",
-  outline:
-    "border border-zinc-300 text-zinc-900 hover:bg-zinc-100 disabled:text-zinc-400 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900",
-  ghost: "text-zinc-700 hover:bg-zinc-100 disabled:text-zinc-400 dark:text-zinc-300 dark:hover:bg-zinc-900",
-  danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-200 disabled:text-red-400",
-  whatsapp: "bg-green-600 text-white hover:bg-green-700",
+  primary: "bg-brand-primary text-white shadow-sm hover:bg-brand-primary-dark disabled:bg-stone-200 disabled:text-stone-400 disabled:shadow-none",
+  outline: "border border-stone-300 bg-white text-stone-900 hover:border-brand-primary hover:text-brand-primary-dark disabled:border-stone-200 disabled:text-stone-400",
+  ghost: "text-stone-700 hover:bg-stone-100 disabled:text-stone-400",
+  danger: "bg-red-600 text-white shadow-sm hover:bg-red-700 disabled:bg-red-200 disabled:text-red-400 disabled:shadow-none",
+  whatsapp: "bg-whatsapp text-white shadow-sm hover:bg-whatsapp-dark",
 } as const;
 
 const SIZE_CLASSES = {
   sm: "px-3 py-1.5 text-xs",
-  md: "px-4 py-2 text-sm",
-  lg: "px-6 py-2.5 text-sm",
+  md: "px-4 py-2.5 text-sm",
+  lg: "px-6 py-3 text-base",
 } as const;
 
 export type ButtonVariant = keyof typeof VARIANT_CLASSES;

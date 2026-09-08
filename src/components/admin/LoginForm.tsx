@@ -22,7 +22,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl: string }) {
         <Input id="password" name="password" type="password" required autoComplete="current-password" />
       </FormField>
 
-      {state.error && <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>}
+      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
 
       <Button type="submit" size="lg" disabled={isPending}>
         {isPending ? "Signing in…" : "Sign in"}

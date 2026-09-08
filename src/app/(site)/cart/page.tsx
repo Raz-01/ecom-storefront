@@ -42,7 +42,7 @@ export default function CartPage() {
     return (
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-4 px-4 py-16 text-center sm:px-6">
         <h1 className="text-xl font-semibold">Your cart is empty</h1>
-        <Link href="/shop" className="text-sm font-medium text-brand-primary-dark underline dark:text-brand-primary">
+        <Link href="/shop" className="text-sm font-medium text-brand-primary-dark underline">
           Continue shopping
         </Link>
       </main>
@@ -64,22 +64,22 @@ export default function CartPage() {
           const appliedTier = line.priceResolution.kind === "priced" ? line.priceResolution.appliedTier : null;
 
           return (
-            <li key={line.productId} className="flex gap-4 border-b border-zinc-200 pb-4 dark:border-zinc-800">
-              <div className="relative h-20 w-20 flex-shrink-0 rounded-md bg-zinc-100 dark:bg-zinc-900">
+            <li key={line.productId} className="flex gap-4 border-b border-stone-200 pb-4">
+              <div className="relative h-20 w-20 flex-shrink-0 rounded-md bg-stone-100">
                 {line.imageUrl ? <Image src={line.imageUrl} alt={line.name} fill sizes="80px" className="rounded-md object-cover" /> : null}
               </div>
               <div className="flex flex-1 flex-col gap-1">
                 <Link href={`/shop/product/${line.slug}`} className="text-sm font-medium hover:underline">
                   {line.name}
                 </Link>
-                <span className="text-xs text-zinc-500">{line.packageSize}</span>
-                <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+                <span className="text-xs text-stone-500">{line.packageSize}</span>
+                <div className="flex items-center gap-2 text-sm text-stone-600">
                   {unitPrice !== null ? formatMoney(unitPrice) : "Quote required"}
                   {appliedTier && <Badge tone="brand">Bulk price</Badge>}
                 </div>
-                {issue && <span className="text-xs text-red-600 dark:text-red-400">{issue}</span>}
+                {issue && <span className="text-xs text-red-600">{issue}</span>}
                 <div className="mt-1 flex items-center gap-3">
-                  <div className="flex items-center rounded-full border border-zinc-300 dark:border-zinc-700">
+                  <div className="flex items-center rounded-full border border-stone-300">
                     <button type="button" onClick={() => setQuantity(line.productId, line.quantity - 1)} className="px-2.5 py-1 text-base leading-none" aria-label="Decrease quantity">
                       −
                     </button>
@@ -88,7 +88,7 @@ export default function CartPage() {
                       +
                     </button>
                   </div>
-                  <button type="button" onClick={() => removeItem(line.productId)} className="text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-300">
+                  <button type="button" onClick={() => removeItem(line.productId)} className="text-xs text-stone-500 underline hover:text-stone-700">
                     Remove
                   </button>
                 </div>
@@ -104,11 +104,11 @@ export default function CartPage() {
           <span>Subtotal</span>
           <span>{formatMoney(subtotalMinor)}</span>
         </div>
-        <p className="text-xs text-zinc-500">Delivery fee is calculated at checkout based on your state.</p>
+        <p className="text-xs text-stone-500">Delivery fee is calculated at checkout based on your state.</p>
         {hasBlockingIssue ? (
           <div className="flex flex-col items-end gap-2">
-            <p className="text-sm text-red-600 dark:text-red-400">Resolve the issues above before checking out.</p>
-            <Link href="/quote" className="text-sm font-medium text-brand-primary-dark underline dark:text-brand-primary">
+            <p className="text-sm text-red-600">Resolve the issues above before checking out.</p>
+            <Link href="/quote" className="text-sm font-medium text-brand-primary-dark underline">
               Request a bulk quote instead
             </Link>
           </div>

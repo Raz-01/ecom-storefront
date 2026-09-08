@@ -14,7 +14,7 @@ export function CartBadge() {
     <Link href="/cart" className="relative flex items-center gap-1.5 text-sm font-medium">
       Cart
       {count > 0 && (
-        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-900 px-1 text-xs font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">
+        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-stone-900 px-1 text-xs font-semibold text-white">
           {count}
         </span>
       )}

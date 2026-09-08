@@ -33,14 +33,14 @@ export default async function ProductInventoryHistoryPage({ params }: PageProps<
     <div className="flex flex-col gap-4">
       <div>
         <h1 className="text-xl font-semibold">{product.name}</h1>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-stone-500">
           {product.sku} · {product.packageSize}
         </p>
       </div>
 
-      <div className="flex items-center gap-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="flex items-center gap-4 rounded-lg border border-stone-200 p-4">
         <div>
-          <p className="text-xs text-zinc-500">Current stock</p>
+          <p className="text-xs text-stone-500">Current stock</p>
           <p className="text-2xl font-semibold">{product.stock}</p>
         </div>
         <StockBadge stock={product.stock} lowStockThreshold={product.lowStockThreshold} />
@@ -63,23 +63,23 @@ export default async function ProductInventoryHistoryPage({ params }: PageProps<
         <Tbody>
           {movements.map((m) => (
             <Tr key={m.id}>
-              <Td className="text-xs text-zinc-500">{m.createdAt.toLocaleString()}</Td>
+              <Td className="text-xs text-stone-500">{m.createdAt.toLocaleString()}</Td>
               <Td>
                 <Badge tone={m.quantityChange > 0 ? "success" : "danger"}>
                   {m.quantityChange > 0 ? "+" : ""}
                   {m.quantityChange}
                 </Badge>
               </Td>
-              <Td className="text-right text-zinc-500">
+              <Td className="text-right text-stone-500">
                 {m.previousQuantity} → {m.newQuantity}
               </Td>
               <Td>{REASON_LABELS[m.reason] ?? m.reason}</Td>
-              <Td className="text-xs text-zinc-500">{m.order ? `Order #${m.order.orderNumber}` : m.admin ? m.admin.name : m.note ?? "—"}</Td>
+              <Td className="text-xs text-stone-500">{m.order ? `Order #${m.order.orderNumber}` : m.admin ? m.admin.name : m.note ?? "—"}</Td>
             </Tr>
           ))}
           {movements.length === 0 && (
             <Tr>
-              <Td colSpan={5} className="py-8 text-center text-sm text-zinc-500">
+              <Td colSpan={5} className="py-8 text-center text-sm text-stone-500">
                 No inventory movements yet.
               </Td>
             </Tr>

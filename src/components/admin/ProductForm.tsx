@@ -142,7 +142,7 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
               onChange={(e) => setBulkPrices((prev) => prev.map((t, idx) => (idx === i ? { ...t, minQuantity: Number(e.target.value) } : t)))}
               className="w-28"
             />
-            <span className="text-sm text-zinc-500">units at ₦</span>
+            <span className="text-sm text-stone-500">units at ₦</span>
             <Input
               type="number"
               min={0}
@@ -152,13 +152,13 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
               onChange={(e) => setBulkPrices((prev) => prev.map((t, idx) => (idx === i ? { ...t, priceMajor: Number(e.target.value) } : t)))}
               className="w-28"
             />
-            <span className="text-sm text-zinc-500">each</span>
-            <button type="button" onClick={() => setBulkPrices((prev) => prev.filter((_, idx) => idx !== i))} className="text-xs text-zinc-500 underline">
+            <span className="text-sm text-stone-500">each</span>
+            <button type="button" onClick={() => setBulkPrices((prev) => prev.filter((_, idx) => idx !== i))} className="text-xs text-stone-500 underline">
               Remove
             </button>
           </div>
         ))}
-        <button type="button" onClick={() => setBulkPrices((prev) => [...prev, { minQuantity: 10, priceMajor: values.priceMajor }])} className="self-start text-sm text-brand-primary-dark underline dark:text-brand-primary">
+        <button type="button" onClick={() => setBulkPrices((prev) => [...prev, { minQuantity: 10, priceMajor: values.priceMajor }])} className="self-start text-sm text-brand-primary-dark underline">
           + Add tier
         </button>
       </div>
@@ -172,7 +172,7 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
         Feature on homepage
       </label>
 
-      {state.error && <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>}
+      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
 
       <Button type="submit" disabled={isPending} className="self-start">
         {isPending ? "Saving…" : isEdit ? "Save changes" : "Create product"}

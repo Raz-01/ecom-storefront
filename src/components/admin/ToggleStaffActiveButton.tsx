@@ -11,7 +11,7 @@ export function ToggleStaffActiveButton({ staffId, isActive, disabled }: { staff
       type="button"
       disabled={disabled || isPending}
       onClick={() => startTransition(() => toggleStaffActive(staffId, !isActive))}
-      className="text-xs font-medium text-zinc-600 underline hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-400 dark:hover:text-zinc-100"
+      className="text-xs font-medium text-stone-600 underline hover:text-stone-900 disabled:cursor-not-allowed disabled:opacity-40"
     >
       {isActive ? "Deactivate" : "Activate"}
     </button>

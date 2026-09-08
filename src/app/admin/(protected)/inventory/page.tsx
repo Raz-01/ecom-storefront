@@ -35,11 +35,11 @@ export default async function AdminInventoryPage() {
                 <Link href={`/admin/inventory/${product.id}`} className="font-medium hover:underline">
                   {product.name}
                 </Link>
-                <div className="text-xs text-zinc-500">{product.packageSize}</div>
+                <div className="text-xs text-stone-500">{product.packageSize}</div>
               </Td>
-              <Td className="text-xs text-zinc-500">{product.sku}</Td>
+              <Td className="text-xs text-stone-500">{product.sku}</Td>
               <Td className="text-right font-medium">{product.stock}</Td>
-              <Td className="text-right text-zinc-500">{product.lowStockThreshold}</Td>
+              <Td className="text-right text-stone-500">{product.lowStockThreshold}</Td>
               <Td>
                 <StockBadge stock={product.stock} lowStockThreshold={product.lowStockThreshold} />
               </Td>

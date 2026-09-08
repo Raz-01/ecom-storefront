@@ -38,14 +38,14 @@ export default async function AdminStaffPage() {
             return (
               <Tr key={member.id}>
                 <Td className="font-medium">
-                  {member.name} {isSelf && <span className="text-xs text-zinc-500">(you)</span>}
+                  {member.name} {isSelf && <span className="text-xs text-stone-500">(you)</span>}
                 </Td>
-                <Td className="text-zinc-500">{member.email}</Td>
+                <Td className="text-stone-500">{member.email}</Td>
                 <Td>
                   <StaffRoleSelect staffId={member.id} role={member.role} disabled={isSelf} />
                 </Td>
                 <Td>{member.isActive ? <Badge tone="success">Active</Badge> : <Badge tone="neutral">Inactive</Badge>}</Td>
-                <Td className="text-xs text-zinc-500">{member.lastLoginAt ? member.lastLoginAt.toLocaleString() : "Never"}</Td>
+                <Td className="text-xs text-stone-500">{member.lastLoginAt ? member.lastLoginAt.toLocaleString() : "Never"}</Td>
                 <Td>
                   <ToggleStaffActiveButton staffId={member.id} isActive={member.isActive} disabled={isSelf} />
                 </Td>
@@ -54,7 +54,7 @@ export default async function AdminStaffPage() {
           })}
         </Tbody>
       </Table>
-      <p className="text-xs text-zinc-500">Role labels: {Object.entries(ROLE_LABELS).map(([k, v]) => `${k} = ${v}`).join(" · ")}</p>
+      <p className="text-xs text-stone-500">Role labels: {Object.entries(ROLE_LABELS).map(([k, v]) => `${k} = ${v}`).join(" · ")}</p>
     </div>
   );
 }

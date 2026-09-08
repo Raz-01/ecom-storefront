@@ -20,15 +20,15 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">{product.name}</h1>
         <div className="text-right text-sm">
-          <p className="text-zinc-500">
-            Current stock: <span className="font-medium text-zinc-900 dark:text-zinc-100">{product.stock}</span>
+          <p className="text-stone-500">
+            Current stock: <span className="font-medium text-stone-900">{product.stock}</span>
           </p>
-          <Link href={`/admin/inventory/${product.id}`} className="text-xs text-brand-primary-dark underline dark:text-brand-primary">
+          <Link href={`/admin/inventory/${product.id}`} className="text-xs text-brand-primary-dark underline">
             Adjust stock in Inventory
           </Link>
         </div>
       </div>
-      {product.previousPriceMinor && <p className="text-xs text-zinc-500">Previous price: {formatMoney(product.previousPriceMinor)}</p>}
+      {product.previousPriceMinor && <p className="text-xs text-stone-500">Previous price: {formatMoney(product.previousPriceMinor)}</p>}
 
       <ProductForm
         categories={categories}
