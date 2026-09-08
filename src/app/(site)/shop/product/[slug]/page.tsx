@@ -7,6 +7,7 @@ import { StockBadge } from "@/components/domain/StockBadge";
 import { ProductDetailActions } from "@/components/site/ProductDetailActions";
 import { BulkPriceTable } from "@/components/site/BulkPriceTable";
 import { buttonClasses } from "@/components/ui/Button";
+import { CategoryIllustration } from "@/components/site/icons/CategoryIllustration";
 
 export default async function ProductPage({ params }: PageProps<"/shop/product/[slug]">) {
   const { slug } = await params;
@@ -15,11 +16,13 @@ export default async function ProductPage({ params }: PageProps<"/shop/product/[
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 md:flex-row">
-      <div className="relative aspect-square w-full flex-shrink-0 rounded-lg bg-stone-100 md:w-1/2">
+      <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden rounded-2xl border border-stone-200 bg-surface-brand-tint shadow-sm md:w-1/2">
         {product.imageUrl ? (
-          <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="rounded-lg object-cover" />
+          <Image src={product.imageUrl} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-stone-400">No image</div>
+          <div className="flex h-full items-center justify-center p-12">
+            <CategoryIllustration categorySlug={product.category.slug} className="h-full w-full" />
+          </div>
         )}
       </div>
       <div className="flex flex-1 flex-col gap-4">
@@ -50,6 +53,17 @@ export default async function ProductPage({ params }: PageProps<"/shop/product/[
         <BulkPriceTable basePriceMinor={product.priceMinor} tiers={product.bulkPrices} bulkQuoteThreshold={product.bulkQuoteThreshold} />
 
         <p className="text-sm leading-relaxed text-stone-600">{product.description}</p>
+
+        <div className="grid grid-cols-1 gap-3 rounded-xl border border-stone-200 bg-surface-muted p-4 text-sm sm:grid-cols-2">
+          <div>
+            <p className="font-medium text-foreground">Delivery</p>
+            <p className="text-stone-600">Nationwide, from our {businessConfig.location.city} warehouse. Fee shown at checkout.</p>
+          </div>
+          <div>
+            <p className="font-medium text-foreground">Pickup</p>
+            <p className="text-stone-600">Collect free from {businessConfig.location.address}.</p>
+          </div>
+        </div>
 
         <div className="flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row">
           <Link href={`/quote?productId=${product.id}`} className={buttonClasses("outline", "md")}>

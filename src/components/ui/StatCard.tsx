@@ -22,7 +22,7 @@ export function StatCard({
   } as const;
 
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-stone-200 bg-white p-4">
+    <div className="flex flex-col gap-1 rounded-xl border border-stone-200 bg-surface p-4 shadow-sm">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-wide text-stone-500">{label}</span>
         {icon ? <span className="text-stone-400">{icon}</span> : null}

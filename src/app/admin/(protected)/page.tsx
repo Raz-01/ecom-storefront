@@ -52,14 +52,14 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <div className="flex gap-1 rounded-full border border-stone-200 p-1">
+        <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
+        <div className="flex gap-1 rounded-full border border-stone-200 bg-surface p-1 shadow-sm">
           {RANGE_OPTIONS.map((opt) => (
             <Link
               key={opt.value}
               href={`/admin?range=${opt.value}`}
               className={`rounded-full px-3 py-1 text-xs font-medium ${
-                opt.value === range.value ? "bg-stone-900 text-white" : "text-stone-600"
+                opt.value === range.value ? "bg-brand-primary text-white" : "text-stone-600 hover:text-brand-primary-dark"
               }`}
             >
               {opt.label}

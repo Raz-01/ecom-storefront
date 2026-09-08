@@ -8,6 +8,7 @@ import { getCartDisplay, type CartLineDisplay } from "@/lib/cart/getCartDisplay"
 import { formatMoney } from "@/lib/currency";
 import { buttonClasses } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 
 function lineIssue(line: CartLineDisplay): string | null {
   if (!line.isActive) return "No longer available — remove to continue";
@@ -56,15 +57,16 @@ export default function CartPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
-      <h1 className="mb-6 text-xl font-semibold">Your cart</h1>
-      <ul className="flex flex-col gap-4">
+      <h1 className="mb-6 text-xl font-semibold text-foreground">Your cart</h1>
+      <Card className="p-4 sm:p-5">
+      <ul className="flex flex-col divide-y divide-stone-100">
         {display.map((line) => {
           const issue = lineIssue(line);
           const unitPrice = line.priceResolution.kind === "priced" ? line.priceResolution.unitPriceMinor : null;
           const appliedTier = line.priceResolution.kind === "priced" ? line.priceResolution.appliedTier : null;
 
           return (
-            <li key={line.productId} className="flex gap-4 border-b border-stone-200 pb-4">
+            <li key={line.productId} className="flex gap-4 py-4 first:pt-0 last:pb-0">
               <div className="relative h-20 w-20 flex-shrink-0 rounded-md bg-stone-100">
                 {line.imageUrl ? <Image src={line.imageUrl} alt={line.name} fill sizes="80px" className="rounded-md object-cover" /> : null}
               </div>
@@ -98,9 +100,10 @@ export default function CartPage() {
           );
         })}
       </ul>
+      </Card>
 
-      <div className="mt-6 flex flex-col items-end gap-4">
-        <div className="flex w-full justify-between text-base font-semibold sm:w-64">
+      <div className="mt-4 flex flex-col items-end gap-4 rounded-xl border border-stone-200 bg-surface p-4 shadow-sm sm:p-5">
+        <div className="flex w-full justify-between text-base font-semibold text-foreground sm:w-64">
           <span>Subtotal</span>
           <span>{formatMoney(subtotalMinor)}</span>
         </div>
