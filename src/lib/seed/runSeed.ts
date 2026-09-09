@@ -47,6 +47,10 @@ type SeedProduct = {
   bulkQuoteThreshold?: number;
   bulkPrices?: { minQuantity: number; pricePerUnitMinor: number }[];
   isFeatured?: boolean;
+  /** Path under /public for a real product photo. Falls back to the category's hand-drawn illustration (see CategoryIllustration) when unset. */
+  imageUrl?: string;
+  /** Defaults to true. Set false to pull a product from customer-facing browsing while keeping it (and its order/inventory history) intact — see the Garri/spice-pack entries below. */
+  isActive?: boolean;
 };
 
 const PRODUCTS: SeedProduct[] = [
@@ -69,6 +73,7 @@ const PRODUCTS: SeedProduct[] = [
       { minQuantity: 25, pricePerUnitMinor: 5_300_000 },
     ],
     isFeatured: true,
+    imageUrl: "/royal-stallion-rice-50kg.jpg",
   },
   {
     name: "Royal Stallion Rice 25kg",
@@ -98,6 +103,7 @@ const PRODUCTS: SeedProduct[] = [
     lowStockThreshold: 10,
     minOrderQuantity: 1,
     isFeatured: true,
+    imageUrl: "/mama-gold-rice-50kg.jpg",
   },
   {
     name: "Honey Beans 50kg",
@@ -114,6 +120,7 @@ const PRODUCTS: SeedProduct[] = [
     minOrderQuantity: 1,
     bulkQuoteThreshold: 30,
     bulkPrices: [{ minQuantity: 10, pricePerUnitMinor: 4_700_000 }],
+    imageUrl: "/beans.webp",
   },
   {
     name: "Drum Beans 50kg",
@@ -128,8 +135,13 @@ const PRODUCTS: SeedProduct[] = [
     receivedStock: 22,
     lowStockThreshold: 10,
     minOrderQuantity: 1,
+    imageUrl: "/beans.webp",
   },
   {
+    // Not sold for now — no product photo yet, and garri isn't part of the
+    // current lineup. Kept here (rather than deleted) instead of removed
+    // outright so its order/inventory history stays intact; see
+    // `isActive` on SeedProduct.
     name: "White Garri 50kg",
     slug: "white-garri-50kg",
     sku: "GARRI-WH-50",
@@ -142,8 +154,12 @@ const PRODUCTS: SeedProduct[] = [
     receivedStock: 18,
     lowStockThreshold: 10,
     minOrderQuantity: 1,
+    isActive: false,
   },
   {
+    // Not sold for now — see White Garri 50kg above. Still referenced by a
+    // seeded historical order (Femi Adekunle), so it stays in this list,
+    // just deactivated.
     name: "Yellow Garri 25kg",
     slug: "yellow-garri-25kg",
     sku: "GARRI-YL-25",
@@ -153,9 +169,10 @@ const PRODUCTS: SeedProduct[] = [
     packageType: "SACK",
     packageSize: "25kg Sack",
     priceMinor: 1_750_000,
-    receivedStock: 2, // deliberately sized to sell out via seeded order history — see reconciliation below
+    receivedStock: 2, // deliberately sized to sell out via seeded order history, see reconciliation below
     lowStockThreshold: 10,
     minOrderQuantity: 1,
+    isActive: false,
   },
   {
     name: "Honeywell Flour 50kg",
@@ -198,6 +215,7 @@ const PRODUCTS: SeedProduct[] = [
     receivedStock: 55,
     lowStockThreshold: 15,
     minOrderQuantity: 1,
+    imageUrl: "/golden-penny-semovita.jpg",
   },
   {
     name: "Golden Penny Semovita 5kg",
@@ -209,9 +227,10 @@ const PRODUCTS: SeedProduct[] = [
     packageType: "PACK",
     packageSize: "5kg Pack",
     priceMinor: 480_000,
-    receivedStock: 16, // deliberately sized to end up low-stock — see reconciliation below
+    receivedStock: 16, // deliberately sized to end up low-stock, see reconciliation below
     lowStockThreshold: 15,
     minOrderQuantity: 1,
+    imageUrl: "/golden-penny-semovita.jpg",
   },
   {
     name: "Devon Kings Palm Oil 25L",
@@ -227,13 +246,29 @@ const PRODUCTS: SeedProduct[] = [
     lowStockThreshold: 8,
     minOrderQuantity: 1,
     isFeatured: true,
+    imageUrl: "/devon-kings-oil-25l.jpg",
+  },
+  {
+    name: "Devon Kings Palm Oil 5L",
+    slug: "devon-kings-palm-oil-5l",
+    sku: "OIL-PALM-5",
+    description: "Refined palm oil in a 5-litre keg, sized for smaller orders.",
+    brand: "Devon Kings",
+    categorySlug: "cooking-oil",
+    packageType: "BOTTLE",
+    packageSize: "5L Keg",
+    priceMinor: 900_000,
+    receivedStock: 40,
+    lowStockThreshold: 10,
+    minOrderQuantity: 1,
+    imageUrl: "/devon-kings-oil-5l.jpg",
   },
   {
     name: "Kings Groundnut Oil 25L",
     slug: "kings-groundnut-oil-25l",
     sku: "OIL-GNUT-25",
     description: "Pure groundnut oil in a 25-litre keg.",
-    brand: "Kings",
+    brand: "Devon Kings",
     categorySlug: "cooking-oil",
     packageType: "BOTTLE",
     packageSize: "25L Keg",
@@ -243,8 +278,8 @@ const PRODUCTS: SeedProduct[] = [
     minOrderQuantity: 1,
   },
   {
-    name: "Indomie Instant Noodles (Carton of 40)",
-    slug: "indomie-instant-noodles-carton",
+    name: "Indomie Chicken Flavour Noodles (Carton of 40)",
+    slug: "indomie-chicken-noodles-carton",
     sku: "NOODLE-INDO-40",
     description: "Chicken-flavour instant noodles, a full carton of 40 sachets.",
     brand: "Indomie",
@@ -256,13 +291,33 @@ const PRODUCTS: SeedProduct[] = [
     lowStockThreshold: 20,
     minOrderQuantity: 1,
     isFeatured: true,
+    imageUrl: "/indomie-noodles-chicken.jpg",
   },
   {
-    name: "Dangote Spaghetti (Carton of 20)",
-    slug: "dangote-spaghetti-carton",
-    sku: "PASTA-DANG-20",
+    name: "Indomie Onion Chicken Flavour Noodles (Carton of 40)",
+    slug: "indomie-onion-chicken-noodles-carton",
+    sku: "NOODLE-INDO-OC-40",
+    description: "Onion chicken-flavour instant noodles, a full carton of 40 sachets.",
+    brand: "Indomie",
+    categorySlug: "noodles-pasta",
+    packageType: "CARTON",
+    packageSize: "Carton of 40",
+    priceMinor: 1_150_000,
+    receivedStock: 90,
+    lowStockThreshold: 20,
+    minOrderQuantity: 1,
+    imageUrl: "/indomie-noodles-onion-chicken.jpg",
+  },
+  {
+    // Was seeded as "Dangote Spaghetti" before a real product photo existed;
+    // the photo provided is Golden Penny spaghetti, so the product was
+    // renamed to match rather than show a mismatched brand photo. `sku` is
+    // kept in sync with the historical-order reference below.
+    name: "Golden Penny Spaghetti (Carton of 20)",
+    slug: "golden-penny-spaghetti-carton",
+    sku: "PASTA-GP-20",
     description: "Durum wheat spaghetti, a full carton of 20 packs.",
-    brand: "Dangote",
+    brand: "Golden Penny",
     categorySlug: "noodles-pasta",
     packageType: "CARTON",
     packageSize: "Carton of 20",
@@ -270,8 +325,29 @@ const PRODUCTS: SeedProduct[] = [
     receivedStock: 75,
     lowStockThreshold: 15,
     minOrderQuantity: 1,
+    imageUrl: "/golden-penny-spaghetti.jpg",
   },
   {
+    name: "Golden Penny Pasta Twist (Carton of 20)",
+    slug: "golden-penny-pasta-twist-carton",
+    sku: "PASTA-GP-TWIST-20",
+    description: "Twist-shaped durum wheat pasta, a full carton of 20 packs.",
+    brand: "Golden Penny",
+    categorySlug: "noodles-pasta",
+    packageType: "CARTON",
+    packageSize: "Carton of 20",
+    priceMinor: 980_000,
+    receivedStock: 60,
+    lowStockThreshold: 15,
+    minOrderQuantity: 1,
+    imageUrl: "/golden-penny-pasta-twist.jpg",
+  },
+  {
+    // Was seeded as "Assorted Bulk Spice Pack" before real spice product
+    // photos existed. Deactivated rather than removed, since it's
+    // referenced by a seeded historical order (Aisha Mohammed) — Spicity
+    // Stew Powder and the other named spice products below replace it in
+    // the active catalog.
     name: "Assorted Bulk Spice Pack",
     slug: "assorted-bulk-spice-pack",
     sku: "SPICE-MIX-CTN",
@@ -284,6 +360,68 @@ const PRODUCTS: SeedProduct[] = [
     receivedStock: 28,
     lowStockThreshold: 10,
     minOrderQuantity: 1,
+    isActive: false,
+  },
+  {
+    name: "Spicity Stew Powder (Carton of 24)",
+    slug: "spicity-stew-powder-carton",
+    sku: "SPICE-SPICITY-24",
+    description: "Ready-mix stew seasoning powder, a full carton of 24 rolls.",
+    brand: "Spicity",
+    categorySlug: "spices",
+    packageType: "CARTON",
+    packageSize: "Carton of 24",
+    priceMinor: 720_000,
+    receivedStock: 40,
+    lowStockThreshold: 10,
+    minOrderQuantity: 1,
+    imageUrl: "/spicity-stew-powder.jpg",
+  },
+  {
+    name: "Mom's Pride Hot Pepper Spice (Carton of 24)",
+    slug: "moms-pride-hot-pepper-spice-carton",
+    sku: "SPICE-MOMS-24",
+    description: "Blended hot pepper seasoning, a full carton of 24 packs.",
+    brand: "Mom's Pride",
+    categorySlug: "spices",
+    packageType: "CARTON",
+    packageSize: "Carton of 24",
+    priceMinor: 680_000,
+    receivedStock: 35,
+    lowStockThreshold: 10,
+    minOrderQuantity: 1,
+    imageUrl: "/moms-pride-hot-pepper-spice.jpg",
+  },
+  {
+    name: "Gino Tomato Paste (Carton of 50)",
+    slug: "gino-tomato-paste-carton",
+    sku: "SPICE-GINO-TOM-50",
+    description: "Concentrated tomato paste, a full carton of 50 tins.",
+    brand: "Gino",
+    categorySlug: "spices",
+    packageType: "CARTON",
+    packageSize: "Carton of 50",
+    priceMinor: 1_400_000,
+    receivedStock: 45,
+    lowStockThreshold: 10,
+    minOrderQuantity: 1,
+    isFeatured: true,
+    imageUrl: "/gino-tomato-paste.jpg",
+  },
+  {
+    name: "Gino Pepper & Onion Mix (Carton of 24)",
+    slug: "gino-pepper-onion-mix-carton",
+    sku: "SPICE-GINO-PO-24",
+    description: "Blended pepper and onion cooking mix, a full carton of 24 sachets.",
+    brand: "Gino",
+    categorySlug: "spices",
+    packageType: "CARTON",
+    packageSize: "Carton of 24",
+    priceMinor: 750_000,
+    receivedStock: 32,
+    lowStockThreshold: 10,
+    minOrderQuantity: 1,
+    imageUrl: "/gino-pepper-and-onion.jpg",
   },
 ];
 
@@ -405,7 +543,7 @@ const ORDER_SCENARIOS: OrderScenario[] = [
     customerName: "Grace Umeh",
     customerPhone: "+2348088889999",
     fulfillmentMethod: "PICKUP",
-    items: [{ sku: "PASTA-DANG-20", quantity: 6 }],
+    items: [{ sku: "PASTA-GP-20", quantity: 6 }],
   },
   {
     daysAgo: 0,
@@ -469,7 +607,7 @@ const QUOTE_SCENARIOS: QuoteScenario[] = [
     customerPhone: "+2348012340002",
     deliveryState: "Lagos",
     items: [{ sku: "BEANS-HB-50", quantity: 40 }],
-    adminNotes: "Sent quote via WhatsApp — awaiting confirmation.",
+    adminNotes: "Sent quote via WhatsApp, awaiting confirmation.",
     handledByEmail: "admin@ilorinbulkmart.demo",
   },
   {
@@ -501,7 +639,7 @@ const QUOTE_SCENARIOS: QuoteScenario[] = [
     customerPhone: "+2348012340005",
     deliveryState: "Ogun",
     items: [{ sku: "FLOUR-MG-25", quantity: 20 }],
-    adminNotes: "Requested price below cost — declined.",
+    adminNotes: "Requested price below cost. Declined.",
     handledByEmail: "admin@ilorinbulkmart.demo",
   },
 ];
@@ -565,7 +703,8 @@ export async function runSeed(prisma: PrismaClient): Promise<SeedResult> {
         lowStockThreshold: product.lowStockThreshold,
         minOrderQuantity: product.minOrderQuantity,
         bulkQuoteThreshold: product.bulkQuoteThreshold,
-        isActive: true,
+        imageUrl: product.imageUrl ?? null,
+        isActive: product.isActive ?? true,
         isFeatured: product.isFeatured ?? false,
       },
       create: {
@@ -582,6 +721,8 @@ export async function runSeed(prisma: PrismaClient): Promise<SeedResult> {
         lowStockThreshold: product.lowStockThreshold,
         minOrderQuantity: product.minOrderQuantity,
         bulkQuoteThreshold: product.bulkQuoteThreshold,
+        imageUrl: product.imageUrl ?? null,
+        isActive: product.isActive ?? true,
         isFeatured: product.isFeatured ?? false,
       },
     });

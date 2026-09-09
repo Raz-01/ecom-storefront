@@ -13,7 +13,7 @@ export default async function QuotePage({ searchParams }: PageProps<"/quote">) {
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-2 px-4 py-8 sm:px-6">
       <h1 className="text-xl font-semibold">Request a bulk quote</h1>
       <p className="mb-4 text-sm text-stone-600">
-        Tell us what you need and how much, and we&apos;ll get back to you with pricing — usually over WhatsApp.
+        Tell us what you need and how much, and we&apos;ll get back to you with pricing, usually over WhatsApp.
       </p>
       <QuoteRequestForm products={products.map((p) => ({ id: p.id, name: p.name, packageSize: p.packageSize }))} initialLine={initialLine} />
     </main>

@@ -21,7 +21,7 @@ export const businessConfig = {
   referenceCodePrefix: "IBL",
   tagline: "Buy Foodstuff in Bulk. Get Better Value. Delivered Across Nigeria.",
   description:
-    "Ilorin Bulk Mart supplies branded, packaged foodstuff in bulk — rice, beans, garri, flour, oil and more — to individuals, retailers, restaurants and distributors across Nigeria, sourced directly from manufacturers.",
+    "Ilorin Bulk Mart supplies branded, packaged foodstuff in bulk, including rice, beans, flour, semovita, cooking oil, noodles, pasta and spices, to individuals, retailers, restaurants and distributors across Nigeria, sourced directly from manufacturers.",
 
   location: {
     city: "Ilorin",

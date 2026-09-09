@@ -13,10 +13,10 @@ import { CategoryIllustration } from "@/components/site/icons/CategoryIllustrati
 export const dynamic = "force-dynamic";
 
 const TRUST_POINTS = [
-  { title: "Sourced direct from manufacturers", body: "No middlemen markup — branded, packaged foodstuff at genuine wholesale prices." },
+  { title: "Sourced direct from manufacturers", body: "No middlemen markup, just branded, packaged foodstuff at genuine wholesale prices." },
   { title: "Nationwide delivery", body: "From our Ilorin warehouse to every state in Nigeria, or collect in person." },
   { title: "Built for bulk buyers", body: "Individuals, retailers, restaurants, supermarkets and distributors all order here." },
-  { title: "Secure payments", body: "Checkout with Paystack — your payment is verified before your order is confirmed." },
+  { title: "Secure payments", body: "Checkout with Paystack. Your payment is verified before your order is confirmed." },
 ];
 
 export default async function Home() {

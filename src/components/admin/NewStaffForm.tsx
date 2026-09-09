@@ -18,7 +18,7 @@ export function NewStaffForm() {
       <FormField label="Email" htmlFor="email">
         <Input id="email" name="email" type="email" required autoComplete="off" />
       </FormField>
-      <FormField label="Temporary password" htmlFor="password" hint="At least 8 characters — share it with them securely and have them change it later.">
+      <FormField label="Temporary password" htmlFor="password" hint="At least 8 characters. Share it with them securely and have them change it later.">
         <Input id="password" name="password" type="password" required minLength={8} autoComplete="new-password" />
       </FormField>
       <FormField label="Role" htmlFor="role">

@@ -130,7 +130,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps<"/admin
                 {canChangeFulfillment ? (
                   <OrderStatusForm orderNumber={order.orderNumber} currentStatus={order.status === "PAID" ? "PROCESSING" : order.status} />
                 ) : (
-                  <p className="text-sm text-stone-500">This order isn&apos;t paid yet — fulfillment status can&apos;t be changed until payment is confirmed.</p>
+                  <p className="text-sm text-stone-500">This order isn&apos;t paid yet. Fulfillment status can&apos;t be changed until payment is confirmed.</p>
                 )}
               </CardContent>
             </Card>

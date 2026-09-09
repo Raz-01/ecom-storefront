@@ -74,7 +74,7 @@ export default async function ProductInventoryHistoryPage({ params }: PageProps<
                 {m.previousQuantity} → {m.newQuantity}
               </Td>
               <Td>{REASON_LABELS[m.reason] ?? m.reason}</Td>
-              <Td className="text-xs text-stone-500">{m.order ? `Order #${m.order.orderNumber}` : m.admin ? m.admin.name : m.note ?? "—"}</Td>
+              <Td className="text-xs text-stone-500">{m.order ? `Order #${m.order.orderNumber}` : m.admin ? m.admin.name : m.note ?? "N/A"}</Td>
             </Tr>
           ))}
           {movements.length === 0 && (

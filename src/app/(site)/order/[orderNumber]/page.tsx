@@ -14,7 +14,7 @@ const STATUS_COPY: Record<string, { title: string; body: string; tone: "success"
   PAID: { title: "Payment received", body: "Thanks! We've got your order and will start preparing it.", tone: "success" },
   PROCESSING: { title: "Payment received", body: "Thanks! We've got your order and will start preparing it.", tone: "success" },
   PENDING_PAYMENT: { title: "Awaiting payment", body: "We haven't received your payment yet. If you already paid, this will update shortly.", tone: "pending" },
-  PAYMENT_PROCESSING: { title: "Payment processing", body: "We're confirming your payment — this page will update shortly.", tone: "pending" },
+  PAYMENT_PROCESSING: { title: "Payment processing", body: "We're confirming your payment. This page will update shortly.", tone: "pending" },
   READY_FOR_PICKUP: { title: "Ready for pickup", body: "Your order is ready to collect from our warehouse.", tone: "success" },
   OUT_FOR_DELIVERY: { title: "Out for delivery", body: "Your order is on its way.", tone: "success" },
   COMPLETED: { title: "Order completed", body: "This order has been delivered/collected. Thanks for shopping with us!", tone: "success" },

@@ -26,7 +26,7 @@ export function StockBadge({ stock, lowStockThreshold }: { stock: number; lowSto
   if (stock <= lowStockThreshold)
     return (
       <Badge tone="warning">
-        <Dot tone="warning" /> Low stock — {stock} left
+        <Dot tone="warning" /> Low stock: {stock} left
       </Badge>
     );
   return (

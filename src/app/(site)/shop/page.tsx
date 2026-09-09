@@ -24,7 +24,7 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
       <div>
         <h1 className="text-xl font-semibold text-foreground">Shop the catalogue</h1>
-        <p className="text-sm text-stone-600">Bulk quantities, wholesale prices — bags, sacks, cartons and kegs.</p>
+        <p className="text-sm text-stone-600">Bulk quantities, wholesale prices: bags, sacks, cartons and kegs.</p>
       </div>
 
       <form className="flex flex-col gap-3 rounded-xl border border-stone-200 bg-surface p-4 shadow-sm sm:flex-row sm:items-center" action="/shop">

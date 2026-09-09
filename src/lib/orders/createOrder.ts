@@ -67,7 +67,7 @@ export async function createOrder(input: CheckoutInput): Promise<Order> {
     const resolution = resolveUnitPrice(product, item.quantity);
     if (resolution.kind === "quote_required") {
       throw new OrderPricingError(
-        `${product.name} at this quantity needs a custom quote — use "Request Bulk Quote" instead of checkout`,
+        `${product.name} at this quantity needs a custom quote. Use "Request Bulk Quote" instead of checkout`,
         "QUOTE_REQUIRED",
         product.id,
       );

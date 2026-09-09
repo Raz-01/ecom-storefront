@@ -11,10 +11,10 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 
 function lineIssue(line: CartLineDisplay): string | null {
-  if (!line.isActive) return "No longer available — remove to continue";
-  if (line.stock < line.quantity) return `Only ${line.stock} left — reduce quantity to continue`;
+  if (!line.isActive) return "No longer available, remove to continue";
+  if (line.stock < line.quantity) return `Only ${line.stock} left, reduce quantity to continue`;
   if (line.quantity < line.minOrderQuantity) return `Minimum order is ${line.minOrderQuantity}`;
-  if (line.priceResolution.kind === "quote_required") return "This quantity needs a custom quote — request one instead of checking out";
+  if (line.priceResolution.kind === "quote_required") return "This quantity needs a custom quote, request one instead of checking out";
   return null;
 }
 
@@ -95,7 +95,7 @@ export default function CartPage() {
                   </button>
                 </div>
               </div>
-              <span className="text-sm font-medium">{unitPrice !== null ? formatMoney(lineTotal(line)) : "—"}</span>
+              <span className="text-sm font-medium">{unitPrice !== null ? formatMoney(lineTotal(line)) : "N/A"}</span>
             </li>
           );
         })}

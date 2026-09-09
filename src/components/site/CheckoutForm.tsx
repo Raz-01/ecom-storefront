@@ -102,7 +102,7 @@ export function CheckoutForm() {
             </div>
             <div className="flex justify-between text-stone-600">
               <span>Delivery</span>
-              <span>{fulfillmentMethod === "PICKUP" ? "Free (pickup)" : deliveryState ? formatMoney(deliveryFeeMinor) : "—"}</span>
+              <span>{fulfillmentMethod === "PICKUP" ? "Free (pickup)" : deliveryState ? formatMoney(deliveryFeeMinor) : "N/A"}</span>
             </div>
             <div className="flex justify-between text-base font-semibold text-foreground">
               <span>Total</span>
@@ -212,13 +212,13 @@ export function CheckoutForm() {
                   clipRule="evenodd"
                 />
               </svg>
-              Secured by Paystack — your payment is verified before your order is confirmed.
+              Secured by Paystack. Your payment is verified before your order is confirmed.
             </p>
             {hasBlockingIssue && (
               <p className="text-sm text-red-600">
-                Some items in your cart need attention —{" "}
+                Some items in your cart need attention.{" "}
                 <Link href="/cart" className="underline">
-                  go back to your cart
+                  Go back to your cart
                 </Link>{" "}
                 to fix them.
               </p>

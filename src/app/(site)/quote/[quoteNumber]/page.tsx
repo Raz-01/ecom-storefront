@@ -20,7 +20,7 @@ export default async function QuoteConfirmationPage({ params }: PageProps<"/quot
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
       <div className="rounded-lg border border-green-200 bg-green-50 p-4">
         <h1 className="text-lg font-semibold">Quote request received</h1>
-        <p className="mt-1 text-sm text-stone-600">Reference #{quote.quoteNumber}. We&apos;ll get back to you shortly — sending it on WhatsApp gets you a faster response.</p>
+        <p className="mt-1 text-sm text-stone-600">Reference #{quote.quoteNumber}. We&apos;ll get back to you shortly. Sending it on WhatsApp gets you a faster response.</p>
       </div>
 
       <div className="rounded-lg border border-stone-200 p-4">
