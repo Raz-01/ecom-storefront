@@ -278,8 +278,11 @@ const PRODUCTS: SeedProduct[] = [
     minOrderQuantity: 1,
   },
   {
+    // Renamed in place from "Indomie Instant Noodles" now that a second
+    // flavor exists — slug is kept unchanged so this upserts onto the
+    // existing row rather than colliding on `sku` with an orphaned one.
     name: "Indomie Chicken Flavour Noodles (Carton of 40)",
-    slug: "indomie-chicken-noodles-carton",
+    slug: "indomie-instant-noodles-carton",
     sku: "NOODLE-INDO-40",
     description: "Chicken-flavour instant noodles, a full carton of 40 sachets.",
     brand: "Indomie",
@@ -309,12 +312,14 @@ const PRODUCTS: SeedProduct[] = [
     imageUrl: "/indomie-noodles-onion-chicken.jpg",
   },
   {
-    // Was seeded as "Dangote Spaghetti" before a real product photo existed;
-    // the photo provided is Golden Penny spaghetti, so the product was
-    // renamed to match rather than show a mismatched brand photo. `sku` is
+    // Was seeded as "Dangote Spaghetti" before a real product photo
+    // existed; the photo provided is Golden Penny spaghetti, so the
+    // product was renamed to match rather than show a mismatched brand
+    // photo. `slug` is kept unchanged so this upserts onto the existing
+    // row instead of colliding on `sku` with an orphaned one; `sku` is
     // kept in sync with the historical-order reference below.
     name: "Golden Penny Spaghetti (Carton of 20)",
-    slug: "golden-penny-spaghetti-carton",
+    slug: "dangote-spaghetti-carton",
     sku: "PASTA-GP-20",
     description: "Durum wheat spaghetti, a full carton of 20 packs.",
     brand: "Golden Penny",
