@@ -39,7 +39,13 @@ async function diagnose() {
   } catch {
     // table doesn't exist (e.g. right after a reset) — that's fine, just report empty.
   }
-  return { tables: tables.map((t) => t.tablename), types: types.map((t) => t.typname), migrations };
+  let products: unknown[] = [];
+  try {
+    products = await prisma.$queryRawUnsafe(`SELECT sku, slug, name, "isActive" FROM "Product" ORDER BY sku`);
+  } catch {
+    // table doesn't exist yet — fine, report empty.
+  }
+  return { tables: tables.map((t) => t.tablename), types: types.map((t) => t.typname), migrations, products };
 }
 
 export async function GET(request: NextRequest) {
