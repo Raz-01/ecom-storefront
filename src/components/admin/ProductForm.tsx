@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { createProduct, updateProduct, type ProductFormState } from "@/app/admin/(protected)/products/actions";
 import { FormField, Input, Select, Textarea } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 type CategoryOption = { id: string; name: string };
 type BulkTier = { minQuantity: number; priceMajor: number };
@@ -63,7 +64,7 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
         <Input id="name" name="name" required defaultValue={values.name} />
       </FormField>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="Slug" htmlFor="slug" hint="Used in the product URL, e.g. royal-stallion-rice-50kg">
           <Input id="slug" name="slug" required defaultValue={values.slug} />
         </FormField>
@@ -76,7 +77,7 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
         <Textarea id="description" name="description" required rows={3} defaultValue={values.description} />
       </FormField>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="Brand (optional)" htmlFor="brand">
           <Input id="brand" name="brand" defaultValue={values.brand} />
         </FormField>
@@ -91,7 +92,7 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
         </FormField>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="Package type" htmlFor="packageType">
           <Select id="packageType" name="packageType" required defaultValue={values.packageType}>
             {PACKAGE_TYPES.map((t) => (
@@ -106,7 +107,7 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
         </FormField>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="Price (₦)" htmlFor="priceMajor">
           <Input id="priceMajor" name="priceMajor" type="number" min={0} step="0.01" required defaultValue={values.priceMajor} />
         </FormField>
@@ -117,7 +118,7 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="Low stock threshold" htmlFor="lowStockThreshold">
           <Input id="lowStockThreshold" name="lowStockThreshold" type="number" min={0} required defaultValue={values.lowStockThreshold} />
         </FormField>
@@ -133,7 +134,7 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium">Bulk price tiers (optional)</p>
         {bulkPrices.map((tier, i) => (
-          <div key={i} className="flex items-center gap-2">
+          <div key={i} className="flex flex-wrap items-center gap-2">
             <Input
               type="number"
               min={1}
@@ -163,8 +164,8 @@ export function ProductForm({ categories, initial, productId }: { categories: Ca
         </button>
       </div>
 
-      <FormField label="Image URL (optional)" htmlFor="imageUrl">
-        <Input id="imageUrl" name="imageUrl" type="url" defaultValue={values.imageUrl} placeholder="https://…" />
+      <FormField label="Product photo (optional)" htmlFor="imageUrl" hint="Falls back to a category illustration when no photo is set.">
+        <ImageUploadField name="imageUrl" defaultValue={values.imageUrl} />
       </FormField>
 
       <label className="flex items-center gap-2 text-sm">
